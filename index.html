@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compendium: Codex do Engenheiro de Dados</title>
+    <link rel="stylesheet" href="style.css?v=1">
+    <link rel="stylesheet" href="theme.css?v=1">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header / Top Bar -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">🌲✨ Compendium</h1>
+                <p class="app-subtitle">Codex do Engenheiro de Dados</p>
+            </div>
+            <div class="header-center">
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Nível:</span>
+                        <span class="stat-value" id="userLevel">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">XP Total:</span>
+                        <span class="stat-value" id="totalXP">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">KP Total:</span>
+                        <span class="stat-value" id="totalKP">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">🔥 Streak:</span>
+                        <span class="stat-value" id="streakDays">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" id="btnExport" title="Exportar dados (JSON)">💾 Exportar</button>
+                <button class="header-btn" id="btnImport" title="Importar dados (JSON)">📂 Importar</button>
+                <button class="header-btn" id="btnBackup" title="Fazer backup">🔐 Backup</button>
+                <button class="header-btn danger" id="btnReset" title="Reiniciar tudo">⚠️ Reiniciar</button>
+                <input type="file" id="fileInput" accept=".json" style="display: none;">
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Sidebar / Navigation -->
+            <nav class="sidebar">
+                <div class="nav-section">
+                    <h2>Categorias</h2>
+                    <ul class="tab-list" id="tabList">
+                        <!-- Tabs serão inseridos via JS -->
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h2>Ferramentas</h2>
+                    <ul class="tool-list">
+                        <li><a href="#" class="nav-link active" data-view="tree">🌳 Árvore</a></li>
+                        <li><a href="#" class="nav-link" data-view="missions">🎯 Missões</a></li>
+                        <li><a href="#" class="nav-link" data-view="achievements">🏆 Conquistas</a></li>
+                        <li><a href="#" class="nav-link" data-view="stats">📊 Estatísticas</a></li>
+                        <li><a href="#" class="nav-link" data-view="history">📜 Histórico</a></li>
+                        <li><a href="#" class="nav-link" data-view="specializations">✨ Especializações</a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <h2>Sessão</h2>
+                    <div class="timer-compact">
+                        <div class="timer-item">
+                            <span class="timer-label">Pomodoro:</span>
+                            <span class="timer-display" id="pomodoroDisplay">25:00</span>
+                            <button class="timer-btn-compact" id="btnPomodoroToggle">▶</button>
+                        </div>
+                        <div class="timer-item">
+                            <span class="timer-label">Sessão:</span>
+                            <span class="timer-display" id="sessionDisplay">00:00</span>
+                            <button class="timer-btn-compact" id="btnSessionToggle">▶</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Tree View (Default) -->
+                <section id="view-tree" class="view-section active">
+                    <div class="tree-header">
+                        <h2 id="categoryTitle">Fundamentos</h2>
+                        <div class="tree-controls">
+                            <button id="btnZoomIn" class="zoom-btn" title="Zoom in (Ctrl++)">🔍+</button>
+                            <button id="btnZoomOut" class="zoom-btn" title="Zoom out (Ctrl+-)">🔍-</button>
+                            <button id="btnZoomReset" class="zoom-btn" title="Centralizar (Ctrl+0)">🎯</button>
+                        </div>
+                    </div>
+                    <div class="tree-container" id="treeContainer">
+                        <svg id="treeCanvas" class="tree-canvas"></svg>
+                    </div>
+                </section>
+
+                <!-- Missions View -->
+                <section id="view-missions" class="view-section">
+                    <div class="panel-header">
+                        <h2>Missões</h2>
+                        <button id="btnNewMission" class="btn-primary">+ Nova Missão</button>
+                    </div>
+                    <div class="missions-container" id="missionsContainer">
+                        <!-- Missões serão inseridas via JS -->
+                    </div>
+                </section>
+
+                <!-- Achievements View -->
+                <section id="view-achievements" class="view-section">
+                    <div class="panel-header">
+                        <h2>Conquistas</h2>
+                    </div>
+                    <div class="achievements-grid" id="achievementsContainer">
+                        <!-- Badges serão inseridos via JS -->
+                    </div>
+                </section>
+
+                <!-- Statistics View -->
+                <section id="view-stats" class="view-section">
+                    <div class="panel-header">
+                        <h2>Estatísticas</h2>
+                    </div>
+                    <div class="stats-container" id="statsContainer">
+                        <!-- Gráficos e números serão inseridos via JS -->
+                    </div>
+                </section>
+
+                <!-- History View -->
+                <section id="view-history" class="view-section">
+                    <div class="panel-header">
+                        <h2>Histórico de Atividades</h2>
+                    </div>
+                    <div class="history-container" id="historyContainer">
+                        <!-- Log de atividades será inserido via JS -->
+                    </div>
+                </section>
+
+                <!-- Specializations View -->
+                <section id="view-specializations" class="view-section">
+                    <div class="panel-header">
+                        <h2>Especializações (Rank Sênior)</h2>
+                    </div>
+                    <div class="specializations-container" id="specializationsContainer">
+                        <!-- Especializações serão inseridas via JS -->
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Node Details Drawer -->
+    <div id="nodeDrawer" class="modal-drawer">
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <h3 id="drawerTitle">Título da Habilidade</h3>
+                <button class="drawer-close" id="btnCloseDrawer">&times;</button>
+            </div>
+            <div class="drawer-body">
+                <div class="drawer-section">
+                    <label>Status: <span id="drawerStatus">Bloqueada</span></label>
+                </div>
+                <div class="drawer-section">
+                    <label>XP Atual: <span id="drawerXPValue">0/100</span></label>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="drawerXPBar"></div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-xp" data-xp="+10">+10</button>
+                        <button class="btn-xp" data-xp="+25">+25</button>
+                        <button class="btn-xp" data-xp="+50">+50</button>
+                        <button class="btn-xp" data-xp="-10">-10</button>
+                    </div>
+                </div>
+                <div class="drawer-section">
+                    <label>KP Atual: <span id="drawerKPValue">0/100</span></label>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="drawerKPBar"></div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-kp" data-kp="+5">+5</button>
+                        <button class="btn-kp" data-kp="+10">+10</button>
+                        <button class="btn-kp" data-kp="+25">+25</button>
+                        <button class="btn-kp" data-kp="-5">-5</button>
+                    </div>
+                </div>
+                <div class="drawer-section" id="prereqWarning" style="display: none;">
+                    <p class="warning-text">⚠️ Recomenda-se completar <strong id="prereqName"></strong> antes.</p>
+                    <button class="btn-secondary" id="btnIgnorePrereq">Continuar assim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mission Modal -->
+    <div id="missionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nova Missão</h3>
+                <button class="modal-close" id="btnCloseMissionModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="missionForm">
+                    <div class="form-group">
+                        <label for="missionName">Nome da Missão</label>
+                        <input type="text" id="missionName" placeholder="Ex: Estudar SQL avançado" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="missionDesc">Descrição</label>
+                        <textarea id="missionDesc" placeholder="Detalhamento do objetivo" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="missionXP">XP</label>
+                            <input type="number" id="missionXP" min="0" value="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="missionKP">KP</label>
+                            <input type="number" id="missionKP" min="0" value="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="missionDiff">Dificuldade</label>
+                            <select id="missionDiff">
+                                <option value="fácil">Fácil</option>
+                                <option value="normal" selected>Normal</option>
+                                <option value="difícil">Difícil</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="missionCategory">Categoria</label>
+                        <select id="missionCategory">
+                            <option value="">Nenhuma</option>
+                            <!-- Será preenchido dinamicamente -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="missionDeadline">Prazo (opcional)</label>
+                        <input type="date" id="missionDeadline">
+                    </div>
+                    <div class="form-group checkbox">
+                        <label>
+                            <input type="checkbox" id="missionRecurring">
+                            Missão recorrente
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">Criar Missão</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data-embedded.js?v=1"></script>
+    <script src="script.js?v=1"></script>
+</body>
+</html>
