@@ -1,0 +1,560 @@
+/**
+ * theme.css
+ * Compendium: Codex do Engenheiro de Dados
+ * Tema: Manuscrito Arcano (Grimório Escuro)
+ *
+ * REGRA DE ARQUITETURA (ver PROMPT_BASE.md seção 1):
+ * Este arquivo cuida SÓ de estética — cores, fontes, texturas, glow.
+ * Nenhum grid, posicionamento, tamanho estrutural ou responsividade aqui.
+ * Isso vive em style.css. Trocar de tema = trocar só este arquivo.
+ *
+ * Fontes usadas (adicionar no <head> do index.html):
+ * <link rel="preconnect" href="https://fonts.googleapis.com">
+ * <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ * <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Crimson+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ */
+
+:root {
+
+  /* ---------------------------------------------------------------
+   * TIPOGRAFIA
+   * Display = títulos/categorias · Body = texto corrido · Mono = XP/KP/código
+   * ------------------------------------------------------------- */
+  --font-display: "Cinzel", "Georgia", serif;
+  --font-body: "Crimson Pro", "Iowan Old Style", serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
+
+  --fs-hero: 2.2rem;
+  --fs-title: 1.5rem;
+  --fs-subtitle: 1.15rem;
+  --fs-body: 1.05rem;
+  --fs-small: 0.95rem;
+  --fs-micro: 0.82rem;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-bold: 700;
+
+  --ls-display: 0.04em; /* leve espaçamento entre letras nos títulos, efeito "gravado" */
+
+  /* ---------------------------------------------------------------
+   * SUPERFÍCIES (fundo em camadas — nunca preto puro)
+   * ------------------------------------------------------------- */
+  --surface-0: #14151a;   /* fundo geral da aplicação — era marrom quente */
+  --surface-1: #1a1c22;   /* topbar, painéis laterais */
+  --surface-2: #202329;   /* cards, drawer, missões */
+  --surface-3: #282b33;   /* hover / elementos elevados */
+  --surface-border: #33363f;
+
+  /* Textura de pergaminho: grão sutil via ruído SVG + leve vinheta radial */
+  --texture-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  /* Vinheta agora usa o próprio dourado do acento, em vez de marrom — reforça
+     "só o dourado é quente" em vez de competir com o fundo esfriado. */
+  --texture-vignette: radial-gradient(ellipse at 50% 20%, rgba(212, 169, 74, 0.09), transparent 65%);
+
+  /* Marca d'água do hexágono — elemento de assinatura visual, usado no
+     espaço vazio do canvas da árvore. */
+  --texture-hex-watermark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='110'%3E%3Cpolygon points='48,4 90,29 90,81 48,106 6,81 6,29' fill='none' stroke='%23d4a94a' stroke-width='1' stroke-opacity='0.05'/%3E%3C/svg%3E");
+
+  /* Rachaduras finas — usadas nos nós "locked", reforçando o efeito de
+     pergaminho antigo selado */
+  --texture-cracks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M22 12 L34 38 L24 52 L38 78' stroke='%23000000' stroke-width='2' fill='none' opacity='0.55' stroke-linecap='round'/%3E%3Cpath d='M72 8 L60 33 L76 48 L64 74' stroke='%23000000' stroke-width='1.6' fill='none' opacity='0.45' stroke-linecap='round'/%3E%3Cpath d='M46 48 L57 64 L49 86' stroke='%23000000' stroke-width='1.3' fill='none' opacity='0.4' stroke-linecap='round'/%3E%3C/svg%3E");
+
+  /* ---------------------------------------------------------------
+   * TEXTO
+   * ------------------------------------------------------------- */
+  --text-primary: #ece7dc;
+  --text-secondary: #aeb0b8; /* era tom quente (tan) — neutro agora, só o dourado carrega calor */
+  --text-muted: #8b8d94;
+  --text-on-accent: #14100b; /* texto escuro sobre fundo dourado/claro, garante contraste AA */
+
+  /* Dourado de destaque — único acento quente da tela (era usado só como
+     hex cru dentro do SVG do watermark; agora é um token de verdade,
+     reutilizável em qualquer elemento que precise desse mesmo dourado). */
+  --accent-gold: #d4a94a;
+
+  /* ---------------------------------------------------------------
+   * ACCENTS SEMÂNTICOS — Estados dos nós (ver PROMPT_BASE.md seção 3)
+   * ------------------------------------------------------------- */
+  --state-locked-fg: #b3a06a;              /* clareado — perdia contraste contra o fundo já esfriado */
+  --state-locked-bg: rgba(72, 61, 32, 0.6);
+  --state-locked-border: #8f7a4a;
+  --state-locked-accent: #c9b16e;
+
+  --state-active-accent: #b8433f;          /* vermelho — "ainda sem XP, mas disponível" */
+  --state-active-glow: rgba(184, 67, 63, 0.55);
+
+  --state-mastered-accent: #5fae6e;        /* verde — "concluído" */
+  --state-mastered-glow: rgba(95, 174, 110, 0.55);
+  --state-mastered-bg: #5fae6e;
+
+  /* Marco Principal (is-boss) não tem mais cor de preenchimento própria —
+     usa um anel dourado por cima da cor real do estado (ver seção "ESTADOS
+     VISUAIS" abaixo), então continua vermelho se ainda não concluído e
+     verde quando concluído, só com o anel de destaque a mais. */
+  --state-boss-trim: #d9b45c;
+  --state-boss-trim-glow: rgba(217, 180, 92, 0.5);
+
+  /* ---------------------------------------------------------------
+   * CORES DE CATEGORIA (espelham data-embedded.js — não duplicar valores lá)
+   * ------------------------------------------------------------- */
+  --cat-fundamentos: #c9a24b;
+  --cat-programacao: #4bb3c9;
+  --cat-banco-dados: #4bc98a;
+  --cat-engenharia-dados: #d98a3d;
+  --cat-cloud: #7a7ad9;
+  --cat-devops: #d94b6a;
+  --cat-visualizacao: #d9c94b;
+  --cat-soft-skills: #a94bd9;
+
+  /* ---------------------------------------------------------------
+   * UI FUNCIONAL (botões de XP/KP, feedback)
+   * ------------------------------------------------------------- */
+  --action-positive: #5cb87a;   /* botões +XP / +KP */
+  --action-positive-hover: #6fd090;
+  --action-negative: #b8544f;   /* botões -XP / -KP */
+  --action-negative-hover: #cf6a64;
+  --action-neutral: var(--surface-3);
+
+  --focus-ring: #e8c874; /* outline de foco — visível sobre fundo escuro, AA-compliant */
+
+  /* ---------------------------------------------------------------
+   * LINHAS DE CONEXÃO SVG (formato Circuito — ângulos retos, sem curvas)
+   * ------------------------------------------------------------- */
+  --line-inactive: #34291a;
+  --line-active: var(--state-mastered-accent);
+  --line-width: 2px;
+  --line-width-active: 2.5px;
+
+  /* ---------------------------------------------------------------
+   * MOVIMENTO
+   * ------------------------------------------------------------- */
+  --pulse-duration: 2.4s;
+  --transition-fast: 140ms ease-out;
+  --transition-base: 220ms ease-out;
+}
+
+/* ===================================================================
+ * prefers-reduced-motion: remove pulso/glow animado, mantém estado
+ * visual estático equivalente (ver PROMPT_BASE.md seção 12)
+ * =================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pulse-duration: 0s;
+  }
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===================================================================
+ * FUNDO GLOBAL DA APLICAÇÃO
+ * =================================================================== */
+body {
+  background-color: var(--surface-0);
+  background-image: var(--texture-vignette), var(--texture-noise);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+}
+
+/* ===================================================================
+ * TIPOGRAFIA — aplicação dos tokens
+ * =================================================================== */
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: var(--ls-display);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+}
+
+.app-title { font-size: var(--fs-hero); }
+.category-title { font-size: var(--fs-title); text-transform: uppercase; }
+.node-label { font-family: var(--font-body); font-size: var(--fs-small); }
+
+/* Rótulos de seção pequenos (Legenda, Meta Semanal, Progresso de Rank,
+   Especializações) — mesma família serifada dos títulos, mas sem herdar o
+   peso bold/brilho forte do h1-h3, já que aqui é rótulo, não título. */
+.stat-caption {
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+}
+
+.font-mono, .xp-value, .kp-value, .level-value {
+  font-family: var(--font-mono);
+}
+
+/* ===================================================================
+ * ESTADOS VISUAIS DOS NÓS
+ * Estrutura (tamanho, posição) fica em style.css — aqui só aparência.
+ * =================================================================== */
+
+.skill-node {
+  font-family: var(--font-body);
+  position: relative; /* ancora o ::after de rachaduras (locked) */
+  transition: box-shadow var(--transition-base), background-color var(--transition-base), border-color var(--transition-base);
+}
+
+/* 🔒 Bloqueada — pergaminho antigo desbotado */
+.skill-node.locked {
+  background-color: var(--state-locked-bg);
+  border-color: var(--state-locked-border);
+  color: var(--state-locked-fg);
+}
+.skill-node.locked .node-icon::before {
+  content: "🔒";
+}
+/* Rachaduras sutis — reforça a leitura de "pergaminho antigo selado" */
+.skill-node.locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-image: var(--texture-cracks);
+  background-size: cover;
+  mix-blend-mode: multiply;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* 🔴 Disponível, ainda sem XP — vermelho sólido, "chama sua atenção" */
+.skill-node.active {
+  background-color: var(--state-active-accent);
+  border-color: var(--state-active-accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--state-active-accent), 0 0 18px var(--state-active-glow);
+  animation: pulse-active var(--pulse-duration) ease-in-out infinite;
+}
+
+@keyframes pulse-active {
+  0%, 100% { box-shadow: 0 0 0 1px var(--state-active-accent), 0 0 14px var(--state-active-glow); }
+  50%      { box-shadow: 0 0 0 1px var(--state-active-accent), 0 0 26px var(--state-active-glow); }
+}
+
+/* 🟢 Concluída — verde sólido */
+.skill-node.mastered {
+  background-color: var(--state-mastered-bg);
+  border-color: var(--state-mastered-accent);
+  color: var(--text-on-accent);
+  box-shadow: 0 0 20px var(--state-mastered-glow);
+}
+
+/* 👑 Marco Principal (is-boss) — não tem cor própria; é um anel dourado
+   somado por cima do estado real (segue vermelho/verde/amarelo normalmente,
+   só com o anel + glow extra sinalizando "isto é um marco"). */
+.skill-node.active.is-boss {
+  box-shadow:
+    0 0 0 3px var(--state-boss-trim), 0 0 20px var(--state-boss-trim-glow),
+    0 0 0 1px var(--state-active-accent), 0 0 18px var(--state-active-glow);
+}
+.skill-node.mastered.is-boss {
+  box-shadow:
+    0 0 0 3px var(--state-boss-trim), 0 0 25px var(--state-boss-trim-glow),
+    0 0 20px var(--state-mastered-glow);
+}
+.skill-node.locked.is-boss {
+  box-shadow: 0 0 0 3px var(--state-boss-trim), 0 0 16px var(--state-boss-trim-glow);
+}
+
+/* ===================================================================
+ * CORES POR CATEGORIA — usadas nas abas e no rótulo da árvore, não mais
+ * nos nós individuais (o vermelho/verde/amarelo já carrega esse sinal
+ * sozinho, misturar com a cor da categoria diluía a leitura rápida).
+ * =================================================================== */
+.cat-fundamentos       { --node-accent: var(--cat-fundamentos); }
+.cat-programacao       { --node-accent: var(--cat-programacao); }
+.cat-banco-dados       { --node-accent: var(--cat-banco-dados); }
+.cat-engenharia-dados  { --node-accent: var(--cat-engenharia-dados); }
+.cat-cloud             { --node-accent: var(--cat-cloud); }
+.cat-devops            { --node-accent: var(--cat-devops); }
+.cat-visualizacao      { --node-accent: var(--cat-visualizacao); }
+.cat-soft-skills       { --node-accent: var(--cat-soft-skills); }
+
+/* ===================================================================
+ * CANVAS DA ÁRVORE — vinheta própria (não a genérica do body, que não
+ * corresponde aos limites reais do canvas) + marca d'água do hexágono.
+ * =================================================================== */
+.tree-canvas {
+  background-image:
+    radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.4) 100%),
+    var(--texture-hex-watermark);
+  background-size: cover, 96px 110px;
+  background-repeat: no-repeat, repeat;
+  background-position: center, center;
+}
+
+/* ===================================================================
+ * LINHAS DE CONEXÃO SVG
+ * =================================================================== */
+.connection-line {
+  stroke: var(--line-inactive);
+  stroke-width: var(--line-width);
+  fill: none;
+}
+.connection-line.energized {
+  stroke: var(--line-active);
+  stroke-width: var(--line-width-active);
+  filter: drop-shadow(0 0 4px var(--state-mastered-glow));
+}
+
+/* ===================================================================
+ * BOTÕES DE XP/KP (drawer)
+ * =================================================================== */
+.btn-xp-positive, .btn-kp-positive {
+  background-color: var(--action-positive);
+  color: var(--text-on-accent);
+  font-family: var(--font-mono);
+  font-weight: var(--fw-medium);
+}
+.btn-xp-positive:hover, .btn-kp-positive:hover {
+  background-color: var(--action-positive-hover);
+}
+.btn-xp-negative, .btn-kp-negative {
+  background-color: var(--action-negative);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+.btn-xp-negative:hover, .btn-kp-negative:hover {
+  background-color: var(--action-negative-hover);
+}
+
+/* ===================================================================
+ * BARRAS DE PROGRESSO (Node Level, Nível Global)
+ * =================================================================== */
+.progress-track {
+  background-color: var(--surface-3);
+  border: 1px solid var(--surface-border);
+}
+.progress-fill {
+  background: linear-gradient(90deg, var(--state-active-accent), var(--state-mastered-accent));
+  transition: width var(--transition-base);
+}
+.progress-fill.mastered {
+  background: var(--state-mastered-accent);
+}
+
+/* ===================================================================
+ * FOCO DE TECLADO (acessibilidade — ver PROMPT_BASE.md seção 12)
+ * =================================================================== */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* ===================================================================
+ * SUPERFÍCIES DE UI (topbar, painéis, drawer, cards)
+ * =================================================================== */
+.topbar {
+  background-color: var(--surface-1);
+  background-image: var(--texture-noise);
+  border-bottom: 1px solid var(--surface-border);
+}
+.panel, .drawer, .mission-card {
+  background-color: var(--surface-2);
+  background-image: var(--texture-noise);
+  border: 1px solid var(--surface-border);
+}
+.panel:hover, .mission-card:hover { background-color: var(--surface-3); }
+
+/* ===================================================================
+ * LEGENDA DA ÁRVORE (character-sheet) — mesmas cores dos estados,
+ * aplicadas a um elemento genérico (.legend-dot), não só a .skill-node
+ * =================================================================== */
+.legend-dot.locked   { background-color: var(--state-locked-border); }
+.legend-dot.active   { background-color: var(--state-active-accent); }
+.legend-dot.mastered { background-color: var(--state-mastered-accent); }
+.legend-dot.is-boss  { background-color: var(--state-boss-trim); }
+
+/* ===================================================================
+ * BOTÕES DE AÇÃO GENÉRICOS (topbar, missões, drawer, formulários)
+ * ------------------------------------------------------------- */
+.btn-topbar {
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--surface-border);
+}
+.btn-topbar:hover { background-color: var(--surface-2); color: var(--text-primary); border-color: var(--text-muted); }
+
+.timer-label { color: var(--text-muted); }
+.timer-value { color: var(--accent-gold); }
+
+.btn-timer {
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--surface-border);
+}
+.btn-timer:hover { color: var(--text-primary); border-color: var(--text-muted); }
+
+.btn-timer-end {
+  color: var(--state-mastered-accent);
+  border-color: var(--state-mastered-accent);
+}
+.btn-timer-end:hover { background-color: var(--state-mastered-accent); color: var(--text-on-accent); }
+
+.btn-primary {
+  background-color: var(--state-mastered-accent);
+  color: var(--text-on-accent);
+  font-weight: var(--fw-medium);
+}
+.btn-primary:hover { filter: brightness(1.1); }
+
+.btn-secondary {
+  background-color: var(--surface-3);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+}
+.btn-secondary:hover { border-color: var(--state-active-accent); }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-danger {
+  background-color: transparent;
+  color: var(--action-negative);
+  border: 1px solid var(--action-negative);
+}
+.btn-danger:hover { background-color: var(--action-negative); color: var(--text-primary); }
+
+.btn-close {
+  background-color: var(--surface-3);
+  color: var(--text-secondary);
+}
+.btn-close:hover { color: var(--text-primary); }
+
+.category-tab {
+  background-color: var(--surface-2);
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
+}
+.category-tab.is-active {
+  background-color: var(--surface-3);
+  color: var(--text-primary);
+  border-color: var(--node-accent, var(--state-active-accent));
+}
+.category-tab-level { color: var(--text-muted); }
+.category-tab-progress { background-color: var(--surface-0); }
+.category-tab-progress-fill { background-color: var(--node-accent, var(--state-active-accent)); }
+
+.tab-btn { color: var(--text-muted); background-color: transparent; }
+.tab-btn.is-active {
+  color: var(--text-primary);
+  background-color: var(--surface-2);
+  border-bottom-color: var(--state-active-accent);
+}
+
+.filter-chip {
+  background-color: var(--surface-2);
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
+}
+.filter-chip.is-active {
+  background-color: var(--surface-3);
+  color: var(--text-primary);
+  border-color: var(--state-active-accent);
+}
+
+.node-chip {
+  background-color: var(--surface-3);
+  color: var(--text-secondary);
+  border: 1px solid var(--surface-border);
+}
+.node-chip-flat {
+  background-color: rgba(217, 180, 92, 0.15);
+  color: var(--state-mastered-accent);
+  border-color: var(--state-mastered-accent);
+}
+
+.form-hint, .stat-hint { color: var(--text-muted); }
+.form-error { color: var(--action-negative); }
+
+.btn-edit-inline {
+  background-color: var(--surface-3);
+  color: var(--text-secondary);
+}
+.btn-edit-inline:hover { color: var(--text-primary); }
+
+.btn-recommend-skill {
+  background-color: var(--state-mastered-accent);
+  color: var(--text-on-accent);
+}
+.btn-recommend-skill:hover { filter: brightness(1.1); }
+
+.achievement-card {
+  background-color: var(--surface-2);
+  background-image: var(--texture-noise);
+  border: 1px solid var(--surface-border);
+}
+.achievement-card.is-unlocked { border-color: var(--state-mastered-accent); box-shadow: 0 0 12px var(--state-mastered-glow); }
+.achievement-card.tier-bronze .achievement-tier { color: #c98a4b; }
+.achievement-card.tier-prata  .achievement-tier { color: #b8bfc9; }
+.achievement-card.tier-ouro   .achievement-tier { color: var(--state-mastered-accent); }
+.achievement-card.is-locked { opacity: 0.55; }
+
+.history-item { background-color: var(--surface-2); background-image: var(--texture-noise); }
+.history-time { color: var(--text-muted); }
+
+.heatmap-cell.heat-0 { background-color: var(--surface-2); }
+.heatmap-cell.heat-1 { background-color: rgba(95, 174, 110, 0.25); }
+.heatmap-cell.heat-2 { background-color: rgba(95, 174, 110, 0.5); }
+.heatmap-cell.heat-3 { background-color: rgba(95, 174, 110, 0.75); }
+.heatmap-cell.heat-4 { background-color: var(--state-mastered-accent); }
+.history-label { color: var(--text-primary); }
+.history-detail { color: var(--text-secondary); }
+
+/* ===================================================================
+ * TOASTS (feedback não-bloqueante) — uma cor de borda por tipo
+ * =================================================================== */
+.celebration-modal {
+  background-color: var(--surface-2);
+  background-image: radial-gradient(ellipse at 50% -10%, rgba(217, 180, 92, 0.25), transparent 60%);
+  border: 1px solid var(--state-mastered-accent);
+  box-shadow: 0 0 40px rgba(95, 174, 110, 0.35), 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.celebration-subtitle { color: var(--text-secondary); }
+
+/* Cada peça de confete recebe uma cor, deslocamento horizontal (--tx),
+   rotação final (--rot) e atraso próprios — cria a sensação de "explosão". */
+.celebration-confetti span:nth-child(1)  { background: var(--state-mastered-accent); left: 20%; --tx: -140px; --rot: -240deg; animation-delay: 0ms; }
+.celebration-confetti span:nth-child(2)  { background: var(--cat-cloud);            left: 30%; --tx: -90px;  --rot: 300deg;  animation-delay: 60ms; }
+.celebration-confetti span:nth-child(3)  { background: var(--state-mastered-accent); left: 40%; --tx: -160px; --rot: 180deg;  animation-delay: 120ms; }
+.celebration-confetti span:nth-child(4)  { background: var(--cat-engenharia-dados); left: 45%; --tx: -40px;  --rot: -180deg; animation-delay: 40ms; }
+.celebration-confetti span:nth-child(5)  { background: var(--cat-devops);           left: 55%; --tx: 40px;   --rot: 220deg;  animation-delay: 100ms; }
+.celebration-confetti span:nth-child(6)  { background: var(--state-mastered-accent); left: 60%; --tx: 160px;  --rot: -300deg; animation-delay: 20ms; }
+.celebration-confetti span:nth-child(7)  { background: var(--cat-visualizacao);     left: 70%; --tx: 90px;   --rot: 260deg;  animation-delay: 140ms; }
+.celebration-confetti span:nth-child(8)  { background: var(--cat-soft-skills);      left: 80%; --tx: 140px;  --rot: -200deg; animation-delay: 80ms; }
+.celebration-confetti span:nth-child(9)  { background: var(--state-mastered-accent); left: 25%; --tx: -110px; --rot: 320deg;  animation-delay: 160ms; }
+.celebration-confetti span:nth-child(10) { background: var(--cat-programacao);      left: 50%; --tx: 10px;   --rot: -260deg; animation-delay: 200ms; }
+.celebration-confetti span:nth-child(11) { background: var(--cat-fundamentos);      left: 35%; --tx: -60px;  --rot: 240deg;  animation-delay: 180ms; }
+.celebration-confetti span:nth-child(12) { background: var(--cat-banco-dados);      left: 65%; --tx: 70px;   --rot: -220deg; animation-delay: 220ms; }
+.celebration-confetti span:nth-child(13) { background: var(--state-mastered-accent); left: 75%; --tx: 120px;  --rot: 280deg;  animation-delay: 10ms; }
+.celebration-confetti span:nth-child(14) { background: var(--cat-cloud);            left: 15%; --tx: -170px; --rot: -320deg; animation-delay: 240ms; }
+
+.toast {
+  background-color: var(--surface-3);
+  color: var(--text-primary);
+  border-left: 5px solid var(--text-muted);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+.toast-info        { border-left-color: var(--state-active-accent); }
+.toast-success      { border-left-color: var(--action-positive); }
+.toast-warning       { border-left-color: var(--action-negative); }
+.toast-suggestion     { border-left-color: var(--cat-cloud); }
+.toast-achievement     { border-left-color: var(--state-mastered-accent); }
+
+/* ===================================================================
+ * FORMULÁRIOS (nova missão)
+ * =================================================================== */
+.form-field input, .form-field textarea, .form-field select {
+  background-color: var(--surface-1);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+}
+.form-field input:focus, .form-field textarea:focus, .form-field select:focus {
+  border-color: var(--state-active-accent);
+}
+.empty-state { color: var(--text-muted); }
+.skill-search {
+  background-color: var(--surface-2);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-border);
+}

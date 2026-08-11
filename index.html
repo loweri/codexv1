@@ -1,264 +1,352 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compendium: Codex do Engenheiro de Dados</title>
-    <link rel="stylesheet" href="style.css?v=1">
-    <link rel="stylesheet" href="theme.css?v=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compendium: Codex do Engenheiro de Dados</title>
+
+  <!-- Fontes do tema Manuscrito Arcano (ver theme.css) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Crimson+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Ordem importa: theme (estética) antes de style (estrutura), -->
+  <!-- para que style.css possa usar as variáveis definidas em theme.css -->
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app" class="app-container">
-        <!-- Header / Top Bar -->
-        <header class="app-header">
-            <div class="header-left">
-                <h1 class="app-title">🌲✨ Compendium</h1>
-                <p class="app-subtitle">Codex do Engenheiro de Dados</p>
-            </div>
-            <div class="header-center">
-                <div class="user-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Nível:</span>
-                        <span class="stat-value" id="userLevel">1</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">XP Total:</span>
-                        <span class="stat-value" id="totalXP">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">KP Total:</span>
-                        <span class="stat-value" id="totalKP">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">🔥 Streak:</span>
-                        <span class="stat-value" id="streakDays">0</span>
-                    </div>
-                </div>
-            </div>
-            <div class="header-right">
-                <button class="header-btn" id="btnExport" title="Exportar dados (JSON)">💾 Exportar</button>
-                <button class="header-btn" id="btnImport" title="Importar dados (JSON)">📂 Importar</button>
-                <button class="header-btn" id="btnBackup" title="Fazer backup">🔐 Backup</button>
-                <button class="header-btn danger" id="btnReset" title="Reiniciar tudo">⚠️ Reiniciar</button>
-                <input type="file" id="fileInput" accept=".json" style="display: none;">
-            </div>
-        </header>
 
-        <!-- Main Container -->
-        <div class="main-container">
-            <!-- Sidebar / Navigation -->
-            <nav class="sidebar">
-                <div class="nav-section">
-                    <h2>Categorias</h2>
-                    <ul class="tab-list" id="tabList">
-                        <!-- Tabs serão inseridos via JS -->
-                    </ul>
-                </div>
-                <div class="nav-section">
-                    <h2>Ferramentas</h2>
-                    <ul class="tool-list">
-                        <li><a href="#" class="nav-link active" data-view="tree">🌳 Árvore</a></li>
-                        <li><a href="#" class="nav-link" data-view="missions">🎯 Missões</a></li>
-                        <li><a href="#" class="nav-link" data-view="achievements">🏆 Conquistas</a></li>
-                        <li><a href="#" class="nav-link" data-view="stats">📊 Estatísticas</a></li>
-                        <li><a href="#" class="nav-link" data-view="history">📜 Histórico</a></li>
-                        <li><a href="#" class="nav-link" data-view="specializations">✨ Especializações</a></li>
-                    </ul>
-                </div>
-                <div class="nav-section">
-                    <h2>Sessão</h2>
-                    <div class="timer-compact">
-                        <div class="timer-item">
-                            <span class="timer-label">Pomodoro:</span>
-                            <span class="timer-display" id="pomodoroDisplay">25:00</span>
-                            <button class="timer-btn-compact" id="btnPomodoroToggle">▶</button>
-                        </div>
-                        <div class="timer-item">
-                            <span class="timer-label">Sessão:</span>
-                            <span class="timer-display" id="sessionDisplay">00:00</span>
-                            <button class="timer-btn-compact" id="btnSessionToggle">▶</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Content Area -->
-            <div class="content-area">
-                <!-- Tree View (Default) -->
-                <section id="view-tree" class="view-section active">
-                    <div class="tree-header">
-                        <h2 id="categoryTitle">Fundamentos</h2>
-                        <div class="tree-controls">
-                            <button id="btnZoomIn" class="zoom-btn" title="Zoom in (Ctrl++)">🔍+</button>
-                            <button id="btnZoomOut" class="zoom-btn" title="Zoom out (Ctrl+-)">🔍-</button>
-                            <button id="btnZoomReset" class="zoom-btn" title="Centralizar (Ctrl+0)">🎯</button>
-                        </div>
-                    </div>
-                    <div class="tree-container" id="treeContainer">
-                        <svg id="treeCanvas" class="tree-canvas"></svg>
-                    </div>
-                </section>
-
-                <!-- Missions View -->
-                <section id="view-missions" class="view-section">
-                    <div class="panel-header">
-                        <h2>Missões</h2>
-                        <button id="btnNewMission" class="btn-primary">+ Nova Missão</button>
-                    </div>
-                    <div class="missions-container" id="missionsContainer">
-                        <!-- Missões serão inseridas via JS -->
-                    </div>
-                </section>
-
-                <!-- Achievements View -->
-                <section id="view-achievements" class="view-section">
-                    <div class="panel-header">
-                        <h2>Conquistas</h2>
-                    </div>
-                    <div class="achievements-grid" id="achievementsContainer">
-                        <!-- Badges serão inseridos via JS -->
-                    </div>
-                </section>
-
-                <!-- Statistics View -->
-                <section id="view-stats" class="view-section">
-                    <div class="panel-header">
-                        <h2>Estatísticas</h2>
-                    </div>
-                    <div class="stats-container" id="statsContainer">
-                        <!-- Gráficos e números serão inseridos via JS -->
-                    </div>
-                </section>
-
-                <!-- History View -->
-                <section id="view-history" class="view-section">
-                    <div class="panel-header">
-                        <h2>Histórico de Atividades</h2>
-                    </div>
-                    <div class="history-container" id="historyContainer">
-                        <!-- Log de atividades será inserido via JS -->
-                    </div>
-                </section>
-
-                <!-- Specializations View -->
-                <section id="view-specializations" class="view-section">
-                    <div class="panel-header">
-                        <h2>Especializações (Rank Sênior)</h2>
-                    </div>
-                    <div class="specializations-container" id="specializationsContainer">
-                        <!-- Especializações serão inseridas via JS -->
-                    </div>
-                </section>
-            </div>
-        </div>
+  <!-- =================================================================
+       TOPBAR — título + gestão de dados (PROMPT_BASE.md seção 11)
+       ================================================================= -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-brand">
+      <span class="topbar-icon" aria-hidden="true">⬡</span>
+      <div>
+        <h1 class="app-title font-display">Compendium</h1>
+        <p class="app-subtitle">Codex do Engenheiro de Dados</p>
+      </div>
     </div>
 
-    <!-- Modals -->
-    <!-- Node Details Drawer -->
-    <div id="nodeDrawer" class="modal-drawer">
-        <div class="drawer-content">
-            <div class="drawer-header">
-                <h3 id="drawerTitle">Título da Habilidade</h3>
-                <button class="drawer-close" id="btnCloseDrawer">&times;</button>
-            </div>
-            <div class="drawer-body">
-                <div class="drawer-section">
-                    <label>Status: <span id="drawerStatus">Bloqueada</span></label>
-                </div>
-                <div class="drawer-section">
-                    <label>XP Atual: <span id="drawerXPValue">0/100</span></label>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="drawerXPBar"></div>
-                    </div>
-                    <div class="button-group">
-                        <button class="btn-xp" data-xp="+10">+10</button>
-                        <button class="btn-xp" data-xp="+25">+25</button>
-                        <button class="btn-xp" data-xp="+50">+50</button>
-                        <button class="btn-xp" data-xp="-10">-10</button>
-                    </div>
-                </div>
-                <div class="drawer-section">
-                    <label>KP Atual: <span id="drawerKPValue">0/100</span></label>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="drawerKPBar"></div>
-                    </div>
-                    <div class="button-group">
-                        <button class="btn-kp" data-kp="+5">+5</button>
-                        <button class="btn-kp" data-kp="+10">+10</button>
-                        <button class="btn-kp" data-kp="+25">+25</button>
-                        <button class="btn-kp" data-kp="-5">-5</button>
-                    </div>
-                </div>
-                <div class="drawer-section" id="prereqWarning" style="display: none;">
-                    <p class="warning-text">⚠️ Recomenda-se completar <strong id="prereqName"></strong> antes.</p>
-                    <button class="btn-secondary" id="btnIgnorePrereq">Continuar assim</button>
-                </div>
-            </div>
-        </div>
+    <!-- Timers sempre visíveis (README seção 1) — "Sessão" alterna modo compacto/expandido -->
+    <div class="topbar-timers" id="topbar-timers">
+      <div class="timer-block" data-timer="pomodoro">
+        <span class="timer-label">Pomodoro</span>
+        <span class="timer-value font-mono" id="pomodoro-value">25:00</span>
+        <button type="button" class="btn-timer" data-action="pause" data-timer="pomodoro" aria-label="Pausar Pomodoro">Pausar</button>
+        <button type="button" class="btn-timer" data-action="reset" data-timer="pomodoro" aria-label="Reiniciar Pomodoro">Reiniciar</button>
+      </div>
+      <div class="timer-block" data-timer="session">
+        <span class="timer-label">Sessão</span>
+        <span class="timer-value font-mono" id="session-value">00:00</span>
+        <button type="button" class="btn-timer" data-action="pause" data-timer="session" aria-label="Pausar Sessão">Pausar</button>
+        <button type="button" class="btn-timer btn-timer-end" data-action="end" data-timer="session" aria-label="Encerrar Sessão">Encerrar</button>
+        <button type="button" class="btn-timer" data-action="reset" data-timer="session" aria-label="Reiniciar Sessão">Reiniciar</button>
+      </div>
     </div>
 
-    <!-- Mission Modal -->
-    <div id="missionModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Nova Missão</h3>
-                <button class="modal-close" id="btnCloseMissionModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="missionForm">
-                    <div class="form-group">
-                        <label for="missionName">Nome da Missão</label>
-                        <input type="text" id="missionName" placeholder="Ex: Estudar SQL avançado" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="missionDesc">Descrição</label>
-                        <textarea id="missionDesc" placeholder="Detalhamento do objetivo" rows="3"></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="missionXP">XP</label>
-                            <input type="number" id="missionXP" min="0" value="50">
-                        </div>
-                        <div class="form-group">
-                            <label for="missionKP">KP</label>
-                            <input type="number" id="missionKP" min="0" value="30">
-                        </div>
-                        <div class="form-group">
-                            <label for="missionDiff">Dificuldade</label>
-                            <select id="missionDiff">
-                                <option value="fácil">Fácil</option>
-                                <option value="normal" selected>Normal</option>
-                                <option value="difícil">Difícil</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="missionCategory">Categoria</label>
-                        <select id="missionCategory">
-                            <option value="">Nenhuma</option>
-                            <!-- Será preenchido dinamicamente -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="missionDeadline">Prazo (opcional)</label>
-                        <input type="date" id="missionDeadline">
-                    </div>
-                    <div class="form-group checkbox">
-                        <label>
-                            <input type="checkbox" id="missionRecurring">
-                            Missão recorrente
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn-primary">Criar Missão</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <div class="topbar-actions" role="toolbar" aria-label="Gestão de dados">
+      <button type="button" id="btn-session" class="btn-topbar">Sessão</button>
+      <button type="button" id="btn-export" class="btn-topbar">Exportar</button>
+      <button type="button" id="btn-import" class="btn-topbar">Importar</button>
+      <input type="file" id="import-file-input" accept="application/json" hidden>
+      <button type="button" id="btn-backup" class="btn-topbar">Backup</button>
+      <button type="button" id="btn-reset" class="btn-topbar btn-danger">Reiniciar</button>
     </div>
+  </header>
 
-    <!-- Scripts -->
-    <script src="data-embedded.js?v=1"></script>
-    <script src="script.js?v=1"></script>
+  <div class="app-layout">
+
+    <!-- ===============================================================
+         FICHA DO PERSONAGEM (lateral esquerda)
+         =============================================================== -->
+    <aside class="character-sheet" id="character-sheet" aria-label="Ficha do personagem">
+      <div class="character-avatar" aria-hidden="true">✦</div>
+
+      <p class="character-level font-mono" id="global-level">0</p>
+      <p class="character-level-label">NÍVEL</p>
+
+      <h2 class="character-title font-display">Engenheiro de Dados</h2>
+      <span class="character-rank" id="character-rank">Aprendiz</span>
+
+      <div class="stat-block">
+        <div class="stat-row">
+          <span>Experiência</span>
+          <span class="font-mono" id="global-xp-label">0</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="global-xp-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="stat-block">
+        <p class="stat-caption">Progresso de Rank</p>
+        <p class="font-mono" id="next-rank-label">Próximo: Estudante</p>
+      </div>
+
+      <hr class="divider">
+
+      <div class="specialization-block">
+        <p class="stat-caption">Especializações</p>
+        <p class="specialization-status" id="specialization-status">Bloqueadas até Rank Sênior (nível 50)</p>
+        <button type="button" id="btn-specializations" class="btn-secondary" disabled>
+          Ver Especializações
+        </button>
+      </div>
+
+      <hr class="divider">
+
+      <div class="weekly-goal-block">
+        <div class="weekly-goal-header">
+          <p class="stat-caption">Meta Semanal</p>
+          <button type="button" id="btn-edit-weekly-goal" class="btn-edit-inline" aria-label="Editar meta semanal">✎</button>
+        </div>
+        <div class="stat-row">
+          <span class="font-mono" id="weekly-goal-progress">0 / 200 XP</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="weekly-goal-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="legend-block">
+        <p class="stat-caption">Legenda da Árvore</p>
+        <ul class="legend-list">
+          <li><span class="legend-dot locked" aria-hidden="true"></span> Bloqueada</li>
+          <li><span class="legend-dot active" aria-hidden="true"></span> Aprendendo</li>
+          <li><span class="legend-dot mastered" aria-hidden="true"></span> Concluída</li>
+          <li><span class="legend-dot is-boss" aria-hidden="true"></span> Marco Principal</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Botão flutuante de recomendação — sugere o que estudar agora -->
+    <button type="button" id="btn-recommend-skill" class="btn-recommend-skill">
+      🎯 O que estudar hoje?
+    </button>
+
+    <!-- ===============================================================
+         ÁRVORE DE HABILIDADES (centro)
+         =============================================================== -->
+    <main class="tree-viewport" id="tree-viewport" aria-label="Árvore de habilidades">
+
+      <div class="tree-toolbar">
+        <div class="zoom-controls" role="group" aria-label="Controles de zoom">
+          <button type="button" id="btn-zoom-out" aria-label="Diminuir zoom">−</button>
+          <span class="font-mono" id="zoom-level">78%</span>
+          <button type="button" id="btn-zoom-in" aria-label="Aumentar zoom">+</button>
+          <button type="button" id="btn-center">Centralizar</button>
+        </div>
+
+        <input
+          type="search"
+          id="skill-search"
+          class="skill-search"
+          placeholder="Buscar habilidade..."
+          aria-label="Buscar habilidade"
+        >
+      </div>
+
+      <nav class="category-tabs" id="category-tabs" aria-label="Categorias da árvore">
+        <!-- script.js preenche uma aba por categoria de window.__EMBEDDED_SKILLS__.categories -->
+      </nav>
+
+      <!-- script.js desenha os nós e as conexões SVG aqui dentro -->
+      <div class="tree-canvas" id="tree-canvas">
+        <svg id="connections-layer" class="connections-layer" aria-hidden="true"></svg>
+        <div id="nodes-layer" class="nodes-layer"></div>
+      </div>
+    </main>
+
+    <!-- ===============================================================
+         PAINEL LATERAL DIREITO (Missões / Conquistas / Estatísticas / Histórico)
+         =============================================================== -->
+    <aside class="side-panel" id="side-panel" aria-label="Painel de progresso">
+      <div class="side-panel-tabs" role="tablist" aria-label="Seções do painel">
+        <button type="button" class="tab-btn is-active" role="tab" aria-selected="true" data-panel="missions">Missões</button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" data-panel="achievements">Conquistas</button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" data-panel="stats">Estatísticas</button>
+        <button type="button" class="tab-btn" role="tab" aria-selected="false" data-panel="history">Histórico</button>
+      </div>
+
+      <!-- Painel: Missões -->
+      <section class="side-panel-content" id="panel-missions" role="tabpanel">
+        <button type="button" id="btn-new-mission" class="btn-primary">+ Nova Missão</button>
+
+        <div class="mission-filters" role="group" aria-label="Filtrar missões">
+          <button type="button" class="filter-chip is-active" data-filter="all">Todas</button>
+          <button type="button" class="filter-chip" data-filter="pendente">Pendentes</button>
+          <button type="button" class="filter-chip" data-filter="em_andamento">Em Andamento</button>
+          <button type="button" class="filter-chip" data-filter="concluida">Concluídas</button>
+        </div>
+
+        <div class="mission-list" id="mission-list">
+          <!-- script.js renderiza os cards de missão aqui, a partir do estado salvo -->
+        </div>
+      </section>
+
+      <!-- Painel: Conquistas -->
+      <section class="side-panel-content" id="panel-achievements" role="tabpanel" hidden>
+        <div class="achievement-grid" id="achievement-grid">
+          <!-- script.js renderiza os badges aqui -->
+        </div>
+      </section>
+
+      <!-- Painel: Estatísticas -->
+      <section class="side-panel-content" id="panel-stats" role="tabpanel" hidden>
+        <div id="stats-content">
+          <!-- script.js renderiza XP/KP semanal e mensal aqui -->
+        </div>
+      </section>
+
+      <!-- Painel: Histórico -->
+      <section class="side-panel-content" id="panel-history" role="tabpanel" hidden>
+        <ul id="history-list" class="history-list">
+          <!-- script.js renderiza o log de atividades aqui -->
+        </ul>
+      </section>
+    </aside>
+  </div>
+
+  <!-- =================================================================
+       DRAWER DO NÓ — abre ao clicar em uma habilidade
+       ================================================================= -->
+  <div class="drawer-overlay" id="drawer-overlay" hidden>
+    <div class="drawer" id="node-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-node-name">
+      <button type="button" id="btn-close-drawer" class="btn-close" aria-label="Fechar">✕</button>
+
+      <h2 id="drawer-node-name" class="font-display">—</h2>
+      <p id="drawer-node-description" class="drawer-description">—</p>
+
+      <div class="drawer-stat">
+        <div class="drawer-stat-header">
+          <span>Nível</span>
+          <span class="font-mono" id="drawer-node-level">0/10</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="drawer-xp-bar" style="width: 0%;"></div>
+        </div>
+        <div class="reward-buttons-row" role="group" aria-label="Adicionar experiência">
+          <button type="button" class="btn-xp-positive" data-xp="10">+10 XP</button>
+          <button type="button" class="btn-xp-positive" data-xp="15">+15 XP</button>
+          <button type="button" class="btn-xp-positive" data-xp="25">+25 XP</button>
+          <button type="button" class="btn-xp-positive" data-xp="40">+40 XP</button>
+        </div>
+        <div class="reward-buttons-row reward-buttons-row-negative" role="group" aria-label="Remover experiência">
+          <button type="button" class="btn-xp-negative" data-xp="-5">-05 XP</button>
+          <button type="button" class="btn-xp-negative" data-xp="-10">-10 XP</button>
+        </div>
+      </div>
+
+      <div class="drawer-stat">
+        <div class="drawer-stat-header">
+          <span>Conhecimento (KP)</span>
+          <span class="font-mono" id="drawer-kp-value">0</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="drawer-kp-bar" style="width: 0%;"></div>
+        </div>
+        <div class="reward-buttons-row" role="group" aria-label="Adicionar conhecimento">
+          <button type="button" class="btn-kp-positive" data-kp="5">+05 KP</button>
+          <button type="button" class="btn-kp-positive" data-kp="10">+10 KP</button>
+          <button type="button" class="btn-kp-positive" data-kp="25">+25 KP</button>
+        </div>
+        <div class="reward-buttons-row reward-buttons-row-negative" role="group" aria-label="Remover conhecimento">
+          <button type="button" class="btn-kp-negative" data-kp="-5">-05 KP</button>
+          <button type="button" class="btn-kp-negative" data-kp="-10">-10 KP</button>
+        </div>
+      </div>
+
+      <button type="button" id="btn-reset-node" class="btn-danger btn-reset-node">Reiniciar esta habilidade</button>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       MODAL: NOVA MISSÃO
+       ================================================================= -->
+  <div class="drawer-overlay" id="mission-form-overlay" hidden>
+    <form class="drawer mission-form" id="mission-form" role="dialog" aria-modal="true" aria-labelledby="mission-form-title">
+      <button type="button" id="btn-close-mission-form" class="btn-close" aria-label="Fechar">✕</button>
+      <h2 id="mission-form-title" class="font-display">Nova Missão</h2>
+
+      <label class="form-field">
+        Nome
+        <input type="text" id="mission-name" required maxlength="80">
+      </label>
+
+      <label class="form-field">
+        Descrição
+        <textarea id="mission-description" rows="2" maxlength="400"></textarea>
+      </label>
+
+      <div class="form-row">
+        <label class="form-field">
+          Dificuldade
+          <select id="mission-difficulty">
+            <option>Fácil</option>
+            <option selected>Médio</option>
+            <option>Difícil</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          Categoria
+          <select id="mission-tag"></select>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label class="form-field">
+          Prazo (opcional)
+          <input type="date" id="mission-deadline">
+        </label>
+
+        <label class="form-field form-checkbox">
+          <input type="checkbox" id="mission-recurring">
+          Recorrente
+        </label>
+      </div>
+
+      <fieldset class="form-field">
+        <legend>Nós vinculados <span class="form-hint">(obrigatório pelo menos 1 — é dali que vem a recompensa)</span></legend>
+        <div id="mission-linked-nodes"></div>
+        <button type="button" id="btn-add-linked-node" class="btn-secondary">+ Adicionar nó</button>
+        <p class="form-error" id="mission-form-error" hidden>Adicione pelo menos um nó vinculado com XP antes de criar a missão.</p>
+      </fieldset>
+
+      <button type="submit" class="btn-primary">Criar Missão</button>
+    </form>
+  </div>
+
+  <!-- =================================================================
+       CELEBRAÇÃO — categoria masterizada ou meta semanal batida.
+       Um "momento de pausa" maior que um toast, à la Duolingo.
+       ================================================================= -->
+  <div class="celebration-overlay" id="celebration-overlay" hidden>
+    <div class="celebration-modal" id="celebration-modal" role="dialog" aria-modal="true" aria-labelledby="celebration-title">
+      <div class="celebration-confetti" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="celebration-icon" id="celebration-icon" aria-hidden="true">🏆</div>
+      <h2 id="celebration-title" class="font-display">Categoria Completa!</h2>
+      <p id="celebration-subtitle" class="celebration-subtitle">—</p>
+      <button type="button" id="btn-close-celebration" class="btn-primary">Continuar</button>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       TOASTS — feedback não-bloqueante (conquistas, sugestões, avisos)
+       ================================================================= -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- =================================================================
+       DADOS EMBUTIDOS — deve carregar antes de script.js
+       ================================================================= -->
+  <script src="data-embedded.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
