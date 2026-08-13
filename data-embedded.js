@@ -39,11 +39,16 @@ window.__EMBEDDED_SKILLS__ = {
     { id: "fund_informacao",  name: "Informação",         category: "fundamentos", tier: 2, row: 0, prereq: "fund_dados",     weight: 1,   description: "Diferença entre dado, informação e conhecimento." },
     { id: "fund_algoritmos",  name: "Algoritmos",         category: "fundamentos", tier: 3, row: 0, prereq: "fund_informacao",weight: 1,   description: "Complexidade (Big O), recursão, estruturas de dados básicas." },
     { id: "fund_estruturas",  name: "Estruturas",         category: "fundamentos", tier: 4, row: 0, prereq: "fund_algoritmos",weight: 1,   description: "Listas, pilhas, filas, árvores e grafos." },
-    { id: "fund_boss",        name: "Desafio de Lógica",  category: "fundamentos", tier: 5, row: 0, prereq: "fund_estruturas",weight: 1.5, description: "Projeto: resolver 20 desafios de lógica/algoritmos.", isBoss: true },
+    { id: "fund_boss",        name: "Desafio de Lógica",  category: "fundamentos", tier: 5, row: 0, prereq: "fund_estruturas",weight: 1.5, description: "Projeto: resolver 20 desafios de lógica/algoritmos.", isBoss: true, deliverables: [
+      "Resolveu os 20 desafios sem consultar solução pronta",
+      "Cada solução tem comentário explicando a lógica usada",
+      "Pelo menos 5 desafios resolvidos com mais de uma abordagem",
+      "Consegue explicar a complexidade (Big O) de pelo menos 3 soluções"
+    ] },
 
     // ===================== 2. PROGRAMAÇÃO =====================
     // Espinha: Python → Logging → POO → Boas Práticas
-    { id: "prog_python",         name: "Python",         category: "programacao", tier: 0, row: 0, prereq: null,              weight: 1,   description: "Sintaxe, tipos, funções e fluxo básico em Python." },
+    { id: "prog_python",         name: "Python",         category: "programacao", tier: 0, row: 0, prereq: null,              weight: 1,   description: "Sintaxe, tipos, funções e fluxo básico em Python.", resources: [{ label: "📄 Docs oficiais do Python", url: "https://docs.python.org/3/" }] },
     { id: "prog_logging",        name: "Logging",        category: "programacao", tier: 1, row: 0, prereq: "prog_python",     weight: 1,   description: "Registro de eventos e depuração estruturada." },
     { id: "prog_poo",            name: "POO",             category: "programacao", tier: 2, row: 0, prereq: "prog_logging",   weight: 1,   description: "Classes, objetos, herança e encapsulamento." },
     { id: "prog_boas_praticas",  name: "Boas Práticas",  category: "programacao", tier: 3, row: 0, prereq: "prog_poo",        weight: 1,   description: "Clean code, PEP8, type hints, testes." },
@@ -56,12 +61,20 @@ window.__EMBEDDED_SKILLS__ = {
     // Ramal: Web
     { id: "prog_requests",       name: "Requests",       category: "programacao", tier: 1, row: 3, prereq: "prog_python",     weight: 0.5, description: "Cliente HTTP para consumo de serviços web." },
     { id: "prog_apis",           name: "APIs",            category: "programacao", tier: 2, row: 3, prereq: "prog_requests",  weight: 0.5, description: "Consumo e construção de APIs REST, autenticação básica." },
+
+    { id: "prog_pytest",         name: "Testes Unitários", category: "programacao", tier: 4, row: 4, prereq: "prog_boas_praticas", weight: 0.5, description: "Testes automatizados com PyTest — funções de teste, fixtures e asserts.", resources: [{ label: "📄 Docs oficiais do PyTest", url: "https://docs.pytest.org/en/stable/" }] },
     // Boss
-    { id: "prog_boss",           name: "Script de ETL",  category: "programacao", tier: 4, row: 0, prereq: "prog_boas_praticas", weight: 1.5, description: "Projeto: construir um script de ETL simples ponta a ponta em Python.", isBoss: true },
+    { id: "prog_boss",           name: "Script de ETL",  category: "programacao", tier: 4, row: 0, prereq: "prog_boas_praticas", weight: 1.5, description: "Projeto: construir um script de ETL simples ponta a ponta em Python.", isBoss: true, deliverables: [
+      "Lê de uma fonte real (arquivo, API ou banco)",
+      "Trata erro de conexão/arquivo ausente sem quebrar o script inteiro",
+      "Tem log das etapas (início, transformação, carga, fim)",
+      "Roda de ponta a ponta com um único comando",
+      "Código com nomes claros, sem gambiarra comentada como TODO"
+    ] },
 
     // ===================== 3. BANCO DE DADOS =====================
     // Espinha: SQL → Consultas → Chaves → Índices
-    { id: "db_sql",           name: "SQL",             category: "banco-dados", tier: 0, row: 0, prereq: null,              weight: 1,   description: "Sintaxe base de SQL (SELECT, WHERE, ORDER BY)." },
+    { id: "db_sql",           name: "SQL",             category: "banco-dados", tier: 0, row: 0, prereq: null,              weight: 1,   description: "Sintaxe base de SQL (SELECT, WHERE, ORDER BY).", resources: [{ label: "📄 Tutorial de SQL (PostgreSQL)", url: "https://www.postgresql.org/docs/current/tutorial.html" }] },
     { id: "db_consultas",     name: "Consultas",       category: "banco-dados", tier: 1, row: 0, prereq: "db_sql",          weight: 1,   description: "JOINs, GROUP BY, subqueries, window functions." },
     { id: "db_chaves",        name: "Chaves",          category: "banco-dados", tier: 2, row: 0, prereq: "db_consultas",    weight: 1,   description: "Chaves primárias, estrangeiras, integridade referencial." },
     { id: "db_indices",       name: "Índices",         category: "banco-dados", tier: 3, row: 0, prereq: "db_chaves",       weight: 1,   description: "Índices e otimização de performance de queries." },
@@ -69,9 +82,14 @@ window.__EMBEDDED_SKILLS__ = {
     { id: "db_modelagem",     name: "Modelagem",       category: "banco-dados", tier: 1, row: 1, prereq: "db_sql",          weight: 0.5, description: "Modelagem entidade-relacionamento (ER)." },
     { id: "db_normalizacao",  name: "Normalização",   category: "banco-dados", tier: 2, row: 1, prereq: "db_modelagem",     weight: 0.5, description: "1FN, 2FN, 3FN — eliminação de redundância." },
     // Ramal: Tecnologia
-    { id: "db_postgresql",    name: "PostgreSQL",     category: "banco-dados", tier: 1, row: 2, prereq: "db_sql",           weight: 0.5, description: "Recursos específicos e administração básica do Postgres." },
+    { id: "db_postgresql",    name: "PostgreSQL",     category: "banco-dados", tier: 1, row: 2, prereq: "db_sql",           weight: 0.5, description: "Recursos específicos e administração básica do Postgres.", resources: [{ label: "📄 Docs oficiais do PostgreSQL", url: "https://www.postgresql.org/docs/current/index.html" }] },
     // Boss
-    { id: "db_boss",          name: "Modelagem Completa", category: "banco-dados", tier: 4, row: 0, prereq: "db_indices",   weight: 1.5, description: "Projeto: modelar e implementar um banco relacional completo.", isBoss: true },
+    { id: "db_boss",          name: "Modelagem Completa", category: "banco-dados", tier: 4, row: 0, prereq: "db_indices",   weight: 1.5, description: "Projeto: modelar e implementar um banco relacional completo.", isBoss: true, deliverables: [
+      "Diagrama ER (mesmo que simples) documentando o modelo",
+      "Pelo menos uma tabela normalizada até 3FN",
+      "Chaves estrangeiras e índices nos campos de busca frequente",
+      "Um conjunto de queries de exemplo (join, agregação) rodando contra o banco"
+    ] },
 
     // ===================== 4. ENGENHARIA DE DADOS (trilha principal) =====================
     // Espinha: ETL → ELT
@@ -86,14 +104,20 @@ window.__EMBEDDED_SKILLS__ = {
     { id: "eng_starschema",   name: "Star Schema",           category: "engenharia-dados", tier: 2, row: 2, prereq: "eng_moddim",      weight: 0.5, description: "Modelo estrela — simplicidade para BI." },
     { id: "eng_snowflake",    name: "Snowflake Schema",      category: "engenharia-dados", tier: 3, row: 2, prereq: "eng_starschema",  weight: 0.5, description: "Normalização de dimensões do modelo estrela." },
     // Ramal: Operação
-    { id: "eng_orquestracao", name: "Orquestração",   category: "engenharia-dados", tier: 1, row: 3, prereq: "eng_etl",           weight: 0.5, description: "Agendamento e dependência de pipelines (Airflow)." },
+    { id: "eng_orquestracao", name: "Orquestração",   category: "engenharia-dados", tier: 1, row: 3, prereq: "eng_etl",           weight: 0.5, description: "Agendamento e dependência de pipelines (Airflow).", resources: [{ label: "📄 Docs oficiais do Apache Airflow", url: "https://airflow.apache.org/docs/" }] },
     { id: "eng_qualidade",    name: "Qualidade de Dados", category: "engenharia-dados", tier: 2, row: 3, prereq: "eng_orquestracao", weight: 0.5, description: "Testes de dados, validação e monitoramento (Great Expectations)." },
     // Boss
-    { id: "eng_boss", name: "Pipeline Completo", category: "engenharia-dados", tier: 4, row: 0, prereq: "eng_elt", weight: 1.5, description: "Projeto: pipeline completo ingestão → transformação → carga em DW.", isBoss: true },
+    { id: "eng_boss", name: "Pipeline Completo", category: "engenharia-dados", tier: 4, row: 0, prereq: "eng_elt", weight: 1.5, description: "Projeto: pipeline completo ingestão → transformação → carga em DW.", isBoss: true, deliverables: [
+      "Ingestão de uma fonte real (API, arquivo ou banco de origem)",
+      "Transformação separada da carga (não tudo num script só)",
+      "Carrega num Data Warehouse ou estrutura equivalente",
+      "Idempotente — rodar de novo não duplica dados",
+      "Tratamento de erro que não derruba o pipeline inteiro numa falha pontual"
+    ] },
 
     // ===================== 5. CLOUD =====================
     // Espinha: AWS → S3 → IAM
-    { id: "cloud_aws", name: "AWS", category: "cloud", tier: 0, row: 0, prereq: null,        weight: 1, description: "Fundamentos da AWS: console, regiões, serviços core." },
+    { id: "cloud_aws", name: "AWS", category: "cloud", tier: 0, row: 0, prereq: null,        weight: 1, description: "Fundamentos da AWS: console, regiões, serviços core.", resources: [{ label: "📄 Docs oficiais da AWS", url: "https://docs.aws.amazon.com/" }] },
     { id: "cloud_s3",  name: "S3",  category: "cloud", tier: 1, row: 0, prereq: "cloud_aws",  weight: 1, description: "Armazenamento de objetos, buckets, políticas de acesso." },
     { id: "cloud_iam", name: "IAM", category: "cloud", tier: 2, row: 0, prereq: "cloud_s3",   weight: 1, description: "Gerenciamento de identidade e acesso." },
     // Ramais standalone
@@ -102,18 +126,28 @@ window.__EMBEDDED_SKILLS__ = {
     { id: "cloud_bigquery",  name: "BigQuery",  category: "cloud", tier: 2, row: 2, prereq: "cloud_gcp",  weight: 0.5, description: "Data warehouse serverless do GCP." },
     { id: "cloud_supabase",  name: "Supabase",  category: "cloud", tier: 1, row: 3, prereq: "cloud_aws",  weight: 0.5, description: "Backend-as-a-service moderno sobre Postgres." },
     // Boss
-    { id: "cloud_boss", name: "Arquitetura Multi-Cloud", category: "cloud", tier: 3, row: 0, prereq: "cloud_iam", weight: 1.5, description: "Projeto: desenhar uma arquitetura resiliente multi-cloud.", isBoss: true },
+    { id: "cloud_boss", name: "Arquitetura Multi-Cloud", category: "cloud", tier: 3, row: 0, prereq: "cloud_iam", weight: 1.5, description: "Projeto: desenhar uma arquitetura resiliente multi-cloud.", isBoss: true, deliverables: [
+      "Diagrama da arquitetura com pelo menos 2 provedores",
+      "Justificativa escrita de por que cada serviço foi escolhido",
+      "Plano de failover ou redundância documentado",
+      "Estimativa de custo, mesmo que aproximada"
+    ] },
 
     // ===================== 6. DEVOPS =====================
     // Espinha: Git → GitHub → CI/CD
-    { id: "devops_git",    name: "Git",    category: "devops", tier: 0, row: 0, prereq: null,           weight: 1, description: "Versionamento local: commits, branches, merge." },
+    { id: "devops_git",    name: "Git",    category: "devops", tier: 0, row: 0, prereq: null,           weight: 1, description: "Versionamento local: commits, branches, merge.", resources: [{ label: "📄 Docs oficiais do Git", url: "https://git-scm.com/doc" }] },
     { id: "devops_github", name: "GitHub", category: "devops", tier: 1, row: 0, prereq: "devops_git",   weight: 1, description: "Colaboração remota: PRs, issues, workflow em equipe." },
     { id: "devops_cicd",   name: "CI/CD",  category: "devops", tier: 2, row: 0, prereq: "devops_github",weight: 1, description: "Integração e entrega contínua — pipelines automatizados." },
     // Ramais standalone
     { id: "devops_linux",  name: "Linux",  category: "devops", tier: 1, row: 1, prereq: "devops_git", weight: 0.5, description: "Terminal, shell scripting, permissões e processos." },
-    { id: "devops_docker", name: "Docker", category: "devops", tier: 1, row: 2, prereq: "devops_git", weight: 0.5, description: "Containers, imagens, Dockerfile e docker-compose." },
+    { id: "devops_docker", name: "Docker", category: "devops", tier: 1, row: 2, prereq: "devops_git", weight: 0.5, description: "Containers, imagens, Dockerfile e docker-compose.", resources: [{ label: "📄 Docs oficiais do Docker", url: "https://docs.docker.com/" }] },
     // Boss
-    { id: "devops_boss", name: "Pipeline CI/CD", category: "devops", tier: 3, row: 0, prereq: "devops_cicd", weight: 1.5, description: "Projeto: pipeline de CI/CD completo com testes automatizados.", isBoss: true },
+    { id: "devops_boss", name: "Pipeline CI/CD", category: "devops", tier: 3, row: 0, prereq: "devops_cicd", weight: 1.5, description: "Projeto: pipeline de CI/CD completo com testes automatizados.", isBoss: true, deliverables: [
+      "Roda testes automatizados a cada push",
+      "Build falha o pipeline se os testes não passarem",
+      "Deploy automatizado pelo menos até um ambiente de staging",
+      "Pipeline documentado (README explicando os estágios)"
+    ] },
 
     // ===================== 7. VISUALIZAÇÃO =====================
     // Espinha: Dashboards → KPIs → Storytelling
@@ -124,7 +158,12 @@ window.__EMBEDDED_SKILLS__ = {
     { id: "viz_powerbi",  name: "Power BI", category: "visualizacao", tier: 1, row: 1, prereq: "viz_dashboards", weight: 0.5, description: "Modelagem e visualização com Power BI." },
     { id: "viz_metabase", name: "Metabase", category: "visualizacao", tier: 1, row: 2, prereq: "viz_dashboards", weight: 0.5, description: "BI open-source self-service." },
     // Boss
-    { id: "viz_boss", name: "Dashboard Executivo", category: "visualizacao", tier: 3, row: 0, prereq: "viz_storytelling", weight: 1.5, description: "Projeto: dashboard com pelo menos 3 KPIs que contam uma história.", isBoss: true },
+    { id: "viz_boss", name: "Dashboard Executivo", category: "visualizacao", tier: 3, row: 0, prereq: "viz_storytelling", weight: 1.5, description: "Projeto: dashboard com pelo menos 3 KPIs que contam uma história.", isBoss: true, deliverables: [
+      "Pelo menos 3 KPIs que respondem uma pergunta de negócio real",
+      "Título e contexto — quem olhar entende sem explicação verbal",
+      "Um filtro ou drill-down interativo",
+      "Testado com alguém de fora do time técnico"
+    ] },
 
     // ===================== 8. SOFT SKILLS =====================
     // Espinha: Comunicação → Documentação → Resolução de Problemas
@@ -135,7 +174,12 @@ window.__EMBEDDED_SKILLS__ = {
     { id: "soft_arquitetura", name: "Arquitetura", category: "soft-skills", tier: 1, row: 1, prereq: "soft_comunicacao", weight: 0.5, description: "Pensamento sistêmico e trade-offs de arquitetura." },
     { id: "soft_entrevistas", name: "Entrevistas", category: "soft-skills", tier: 1, row: 2, prereq: "soft_comunicacao", weight: 0.5, description: "Preparação técnica e comportamental para entrevistas." },
     // Boss
-    { id: "soft_boss", name: "Liderança Técnica", category: "soft-skills", tier: 3, row: 0, prereq: "soft_resolucao", weight: 1.5, description: "Marco: liderar tecnicamente uma entrega ou mentoria.", isBoss: true },
+    { id: "soft_boss", name: "Liderança Técnica", category: "soft-skills", tier: 3, row: 0, prereq: "soft_resolucao", weight: 1.5, description: "Marco: liderar tecnicamente uma entrega ou mentoria.", isBoss: true, deliverables: [
+      "Liderou (ou mentorou) uma entrega real, não hipotética",
+      "Documentou decisões técnicas tomadas, não só o resultado",
+      "Deu ou recebeu feedback estruturado durante o processo",
+      "Consegue descrever um trade-off negociado com a equipe"
+    ] },
 
     // ===================== ESPECIALIZAÇÕES (desbloqueiam em Rank Sênior, nível ≥ 50) =====================
     // Cada uma ancorada no boss da categoria-mãe. Não entram no cálculo de globalLevel.
@@ -240,15 +284,43 @@ window.__EMBEDDED_SKILLS__ = {
     { id: "ach_rank_senior", name: "Rank Sênior Alcançado",  scope: "global", tier: "ouro",    hidden: false, condition: "rank == 'Sênior'", bonusXp: 400 },
     { id: "ach_surprise_1",  name: "???",                     scope: "global", tier: "prata",   hidden: true,  condition: "totalXp >= 3000", bonusXp: 200 },
 
-    // --- Por categoria (exemplo replicável para as 8 categorias) ---
-    { id: "ach_prog_50",     name: "Metade do Caminho: Programação", scope: "categoria", categoryId: "programacao",      tier: "bronze", hidden: false, condition: "categoryProgress('programacao') >= 50",      bonusXp: 60 },
+    // --- Horas totais de estudo (alimentado por totalStudySeconds — soma de sessões encerradas) ---
+    { id: "ach_hours_50",   name: "50 Horas de Codex",   scope: "global", tier: "bronze", hidden: false, condition: "totalHours >= 50",  bonusXp: 80  },
+    { id: "ach_hours_200",  name: "200 Horas de Codex",  scope: "global", tier: "prata",   hidden: false, condition: "totalHours >= 200", bonusXp: 250 },
+    { id: "ach_hours_400",  name: "400 Horas de Codex",  scope: "global", tier: "ouro",    hidden: false, condition: "totalHours >= 400", bonusXp: 500 },
+
+    // --- Domínio Profundo (XP máximo + KP alto no mesmo nó — usa deepMasteryCount) ---
+    { id: "ach_deep_1",  name: "Domínio Profundo",              scope: "global", tier: "bronze", hidden: false, condition: "deepMasteryCount >= 1",  bonusXp: 80  },
+    { id: "ach_deep_5",  name: "Domínio Profundo: Consistente",  scope: "global", tier: "prata",   hidden: false, condition: "deepMasteryCount >= 5",  bonusXp: 200 },
+    { id: "ach_deep_15", name: "Domínio Profundo: Mestre",       scope: "global", tier: "ouro",    hidden: false, condition: "deepMasteryCount >= 15", bonusXp: 450 },
+
+    // --- Por categoria (agora completo pras 8 categorias) ---
+    { id: "ach_fund_50",     name: "Metade do Caminho: Fundamentos",  scope: "categoria", categoryId: "fundamentos",      tier: "bronze", hidden: false, condition: "categoryProgress('fundamentos') >= 50",      bonusXp: 60 },
+    { id: "ach_fund_100",    name: "Mestre em Fundamentos",           scope: "categoria", categoryId: "fundamentos",      tier: "ouro",    hidden: false, condition: "categoryProgress('fundamentos') >= 100",     bonusXp: 200 },
+    { id: "ach_prog_50",     name: "Metade do Caminho: Programação",  scope: "categoria", categoryId: "programacao",      tier: "bronze", hidden: false, condition: "categoryProgress('programacao') >= 50",      bonusXp: 60 },
     { id: "ach_prog_100",    name: "Mestre em Programação",           scope: "categoria", categoryId: "programacao",      tier: "ouro",    hidden: false, condition: "categoryProgress('programacao') >= 100",     bonusXp: 200 },
+    { id: "ach_db_50",       name: "Metade do Caminho: Banco de Dados",scope: "categoria", categoryId: "banco-dados",     tier: "bronze", hidden: false, condition: "categoryProgress('banco-dados') >= 50",      bonusXp: 60 },
+    { id: "ach_db_100",      name: "Mestre em Banco de Dados",        scope: "categoria", categoryId: "banco-dados",      tier: "ouro",    hidden: false, condition: "categoryProgress('banco-dados') >= 100",     bonusXp: 200 },
     { id: "ach_eng_50",      name: "Metade do Caminho: Eng. de Dados",scope: "categoria", categoryId: "engenharia-dados", tier: "bronze", hidden: false, condition: "categoryProgress('engenharia-dados') >= 50", bonusXp: 60 },
     { id: "ach_eng_100",     name: "Mestre em Engenharia de Dados",   scope: "categoria", categoryId: "engenharia-dados", tier: "ouro",    hidden: false, condition: "categoryProgress('engenharia-dados') >= 100",bonusXp: 200 },
     { id: "ach_eng_surprise",name: "???",                              scope: "categoria", categoryId: "engenharia-dados", tier: "prata",   hidden: true,  condition: "categoryProgress('engenharia-dados') >= 75", bonusXp: 120 },
+    { id: "ach_cloud_50",    name: "Metade do Caminho: Cloud",        scope: "categoria", categoryId: "cloud",            tier: "bronze", hidden: false, condition: "categoryProgress('cloud') >= 50",            bonusXp: 60 },
+    { id: "ach_cloud_100",   name: "Mestre em Cloud",                 scope: "categoria", categoryId: "cloud",            tier: "ouro",    hidden: false, condition: "categoryProgress('cloud') >= 100",           bonusXp: 200 },
+    { id: "ach_devops_50",   name: "Metade do Caminho: DevOps",       scope: "categoria", categoryId: "devops",           tier: "bronze", hidden: false, condition: "categoryProgress('devops') >= 50",           bonusXp: 60 },
+    { id: "ach_devops_100",  name: "Mestre em DevOps",                scope: "categoria", categoryId: "devops",           tier: "ouro",    hidden: false, condition: "categoryProgress('devops') >= 100",          bonusXp: 200 },
+    { id: "ach_viz_50",      name: "Metade do Caminho: Visualização", scope: "categoria", categoryId: "visualizacao",     tier: "bronze", hidden: false, condition: "categoryProgress('visualizacao') >= 50",     bonusXp: 60 },
+    { id: "ach_viz_100",     name: "Mestre em Visualização",          scope: "categoria", categoryId: "visualizacao",     tier: "ouro",    hidden: false, condition: "categoryProgress('visualizacao') >= 100",    bonusXp: 200 },
+    { id: "ach_soft_50",     name: "Metade do Caminho: Soft Skills",  scope: "categoria", categoryId: "soft-skills",      tier: "bronze", hidden: false, condition: "categoryProgress('soft-skills') >= 50",      bonusXp: 60 },
+    { id: "ach_soft_100",    name: "Mestre em Soft Skills",           scope: "categoria", categoryId: "soft-skills",      tier: "ouro",    hidden: false, condition: "categoryProgress('soft-skills') >= 100",     bonusXp: 200 },
 
-    // --- Especializações (uma por categoria concluída) ---
-    { id: "ach_spec_eng",   name: "Especialista em Engenharia de Dados", scope: "categoria", categoryId: "engenharia-dados", tier: "ouro", hidden: false, condition: "specializationComplete('engenharia-dados')", bonusXp: 400 },
-    { id: "ach_spec_cloud", name: "Especialista em Cloud",                scope: "categoria", categoryId: "cloud",            tier: "ouro", hidden: false, condition: "specializationComplete('cloud')",            bonusXp: 400 }
+    // --- Especializações (uma por categoria concluída — agora completo pras 8) ---
+    { id: "ach_spec_fund",   name: "Especialista em Fundamentos",         scope: "categoria", categoryId: "fundamentos",      tier: "ouro", hidden: false, condition: "specializationComplete('fundamentos')",      bonusXp: 400 },
+    { id: "ach_spec_prog",   name: "Especialista em Programação",         scope: "categoria", categoryId: "programacao",      tier: "ouro", hidden: false, condition: "specializationComplete('programacao')",      bonusXp: 400 },
+    { id: "ach_spec_db",     name: "Especialista em Banco de Dados",      scope: "categoria", categoryId: "banco-dados",      tier: "ouro", hidden: false, condition: "specializationComplete('banco-dados')",      bonusXp: 400 },
+    { id: "ach_spec_eng",    name: "Especialista em Engenharia de Dados", scope: "categoria", categoryId: "engenharia-dados", tier: "ouro", hidden: false, condition: "specializationComplete('engenharia-dados')", bonusXp: 400 },
+    { id: "ach_spec_cloud",  name: "Especialista em Cloud",                scope: "categoria", categoryId: "cloud",            tier: "ouro", hidden: false, condition: "specializationComplete('cloud')",            bonusXp: 400 },
+    { id: "ach_spec_devops", name: "Especialista em DevOps",               scope: "categoria", categoryId: "devops",           tier: "ouro", hidden: false, condition: "specializationComplete('devops')",           bonusXp: 400 },
+    { id: "ach_spec_viz",    name: "Especialista em Visualização",         scope: "categoria", categoryId: "visualizacao",     tier: "ouro", hidden: false, condition: "specializationComplete('visualizacao')",     bonusXp: 400 },
+    { id: "ach_spec_soft",   name: "Especialista em Soft Skills",          scope: "categoria", categoryId: "soft-skills",      tier: "ouro", hidden: false, condition: "specializationComplete('soft-skills')",      bonusXp: 400 }
   ]
 };

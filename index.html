@@ -12,8 +12,29 @@
 
   <!-- Ordem importa: theme (estética) antes de style (estrutura), -->
   <!-- para que style.css possa usar as variáveis definidas em theme.css -->
-  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="theme.css" id="theme-dark-link">
+  <link rel="stylesheet" href="theme-light.css" id="theme-light-link" disabled>
+  <script>
+    // Aplica o tema salvo ANTES do resto da página pintar — evita o "flash"
+    // do tema escuro (padrão) por uma fração de segundo antes de trocar
+    // pro claro, pra quem já escolheu o claro antes.
+    (function () {
+      try {
+        var raw = localStorage.getItem('codex_ui_prefs_v1');
+        var prefs = raw ? JSON.parse(raw) : null;
+        if (prefs && prefs.theme === 'light') {
+          document.getElementById('theme-dark-link').disabled = true;
+          document.getElementById('theme-light-link').disabled = false;
+        }
+      } catch (e) { /* silencioso — pior caso, mantém o tema escuro padrão */ }
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
+
+  <!-- PWA: instalável e com fallback offline (ver service-worker.js) -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f0c09">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
 </head>
 <body>
 
@@ -29,6 +50,11 @@
       </div>
     </div>
 
+    <div class="streak-indicator" id="streak-indicator" title="Dias seguidos estudando">
+      <span class="streak-flame" id="streak-flame" aria-hidden="true">🔥</span>
+      <span class="streak-count font-mono" id="streak-count-topbar">0</span>
+    </div>
+
     <!-- Timers sempre visíveis (README seção 1) — "Sessão" alterna modo compacto/expandido -->
     <div class="topbar-timers" id="topbar-timers">
       <div class="timer-block" data-timer="pomodoro">
@@ -41,18 +67,34 @@
         <span class="timer-label">Sessão</span>
         <span class="timer-value font-mono" id="session-value">00:00</span>
         <button type="button" class="btn-timer" data-action="pause" data-timer="session" aria-label="Pausar Sessão">Pausar</button>
-        <button type="button" class="btn-timer btn-timer-end" data-action="end" data-timer="session" aria-label="Encerrar Sessão">Encerrar</button>
-        <button type="button" class="btn-timer" data-action="reset" data-timer="session" aria-label="Reiniciar Sessão">Reiniciar</button>
+        <button type="button" class="btn-timer btn-timer-end" data-action="stop" data-timer="session" aria-label="Encerrar Sessão e somar ao total">Encerrar</button>
+        <button type="button" class="btn-timer" data-action="reset" data-timer="session" aria-label="Descartar Sessão sem somar ao total">Reiniciar</button>
+      </div>
+      <div class="timer-block timer-block-total" id="total-hours-block" title="Soma de todas as sessões já encerradas — nunca diminui">
+        <span class="timer-label">Total</span>
+        <span class="timer-value font-mono" id="total-hours-value">0h 00min</span>
       </div>
     </div>
 
     <div class="topbar-actions" role="toolbar" aria-label="Gestão de dados">
       <button type="button" id="btn-session" class="btn-topbar">Sessão</button>
-      <button type="button" id="btn-export" class="btn-topbar">Exportar</button>
-      <button type="button" id="btn-import" class="btn-topbar">Importar</button>
-      <input type="file" id="import-file-input" accept="application/json" hidden>
-      <button type="button" id="btn-backup" class="btn-topbar">Backup</button>
-      <button type="button" id="btn-reset" class="btn-topbar btn-danger">Reiniciar</button>
+      <button type="button" id="btn-undo" class="btn-topbar" disabled title="Desfaz o último +/- XP ou KP" aria-label="Desfazer último lançamento">↺</button>
+
+      <div class="topbar-menu">
+        <button type="button" id="btn-topbar-menu" class="btn-topbar" aria-haspopup="true" aria-expanded="false" aria-label="Mais opções">☰</button>
+        <div class="topbar-menu-dropdown" id="topbar-menu-dropdown" hidden>
+          <button type="button" id="btn-install-app" class="topbar-menu-item" hidden>📲 Instalar app</button>
+          <button type="button" id="btn-notifications" class="topbar-menu-item" aria-pressed="false">🔔 Notificações: Desligadas</button>
+          <button type="button" id="btn-theme-toggle" class="topbar-menu-item" title="Trocar tema visual" aria-label="Trocar entre tema escuro e tema claro">🎨 Tema</button>
+          <hr class="topbar-menu-divider">
+          <button type="button" id="btn-export" class="topbar-menu-item">Exportar</button>
+          <button type="button" id="btn-import" class="topbar-menu-item">Importar</button>
+          <input type="file" id="import-file-input" accept="application/json" hidden>
+          <button type="button" id="btn-backup" class="topbar-menu-item">Backup</button>
+          <hr class="topbar-menu-divider">
+          <button type="button" id="btn-reset" class="topbar-menu-item topbar-menu-item-danger">Reiniciar</button>
+        </div>
+      </div>
     </div>
   </header>
 
@@ -62,6 +104,8 @@
          FICHA DO PERSONAGEM (lateral esquerda)
          =============================================================== -->
     <aside class="character-sheet" id="character-sheet" aria-label="Ficha do personagem">
+      <button type="button" class="sidebar-toggle sidebar-toggle-left" id="btn-toggle-left" aria-label="Recolher ficha do personagem" aria-expanded="true" aria-controls="character-sheet-inner">‹</button>
+      <div class="sidebar-inner" id="character-sheet-inner">
       <div class="character-avatar" aria-hidden="true">✦</div>
 
       <p class="character-level font-mono" id="global-level">0</p>
@@ -85,11 +129,38 @@
         <p class="font-mono" id="next-rank-label">Próximo: Estudante</p>
       </div>
 
+      <div class="stat-block">
+        <div class="stat-caption-row">
+          <p class="stat-caption">Horas de Estudo (total)</p>
+          <button type="button" id="btn-add-manual-hours" class="btn-edit-inline" aria-label="Registrar horas estudadas sem o timer" title="Registrar tempo estudado sem o timer">+</button>
+        </div>
+        <p class="font-mono" id="character-total-hours">0h 00min</p>
+      </div>
+
+      <div class="stat-block">
+        <div class="stat-caption-row">
+          <p class="stat-caption">Atributos</p>
+          <span class="info-tooltip">
+            <button type="button" class="info-icon" aria-label="Como os atributos são calculados" aria-expanded="false">i</button>
+            <span class="info-tooltip-content" role="tooltip">
+              Cada atributo é a média de progresso (0–100%) das categorias ligadas a ele, numa escala de 10 a 20. <strong>INT</strong>: Fundamentos + Banco de Dados · <strong>DEX</strong>: Programação + DevOps · <strong>CON</strong>: Eng. de Dados + Cloud · <strong>WIS</strong>: Visualização · <strong>CHA</strong>: Soft Skills.
+            </span>
+          </span>
+        </div>
+        <div class="attributes-grid" id="attributes-grid">
+          <div class="attribute-item"><span class="attribute-label">INT</span><span class="attribute-value font-mono" id="attr-INT">10</span></div>
+          <div class="attribute-item"><span class="attribute-label">DEX</span><span class="attribute-value font-mono" id="attr-DEX">10</span></div>
+          <div class="attribute-item"><span class="attribute-label">CON</span><span class="attribute-value font-mono" id="attr-CON">10</span></div>
+          <div class="attribute-item"><span class="attribute-label">WIS</span><span class="attribute-value font-mono" id="attr-WIS">10</span></div>
+          <div class="attribute-item"><span class="attribute-label">CHA</span><span class="attribute-value font-mono" id="attr-CHA">10</span></div>
+        </div>
+      </div>
+
       <hr class="divider">
 
       <div class="specialization-block">
         <p class="stat-caption">Especializações</p>
-        <p class="specialization-status" id="specialization-status">Bloqueadas até Rank Sênior (nível 50)</p>
+        <p class="specialization-status" id="specialization-status">Bloqueadas até completar o Marco Principal desta categoria</p>
         <button type="button" id="btn-specializations" class="btn-secondary" disabled>
           Ver Especializações
         </button>
@@ -121,17 +192,20 @@
           <li><span class="legend-dot is-boss" aria-hidden="true"></span> Marco Principal</li>
         </ul>
       </div>
+      </div>
     </aside>
-
-    <!-- Botão flutuante de recomendação — sugere o que estudar agora -->
-    <button type="button" id="btn-recommend-skill" class="btn-recommend-skill">
-      🎯 O que estudar hoje?
-    </button>
 
     <!-- ===============================================================
          ÁRVORE DE HABILIDADES (centro)
          =============================================================== -->
     <main class="tree-viewport" id="tree-viewport" aria-label="Árvore de habilidades">
+
+      <!-- Botão flutuante de recomendação — vive DENTRO do tree-viewport
+           (não mais fixed na viewport inteira) pra nunca sobrepor os
+           painéis laterais, seja qual for a largura deles. -->
+      <button type="button" id="btn-recommend-skill" class="btn-recommend-skill">
+        🎯 O que estudar hoje?
+      </button>
 
       <div class="tree-toolbar">
         <div class="zoom-controls" role="group" aria-label="Controles de zoom">
@@ -165,6 +239,8 @@
          PAINEL LATERAL DIREITO (Missões / Conquistas / Estatísticas / Histórico)
          =============================================================== -->
     <aside class="side-panel" id="side-panel" aria-label="Painel de progresso">
+      <button type="button" class="sidebar-toggle sidebar-toggle-right" id="btn-toggle-right" aria-label="Recolher painel lateral" aria-expanded="true" aria-controls="side-panel-inner">›</button>
+      <div class="sidebar-inner" id="side-panel-inner">
       <div class="side-panel-tabs" role="tablist" aria-label="Seções do painel">
         <button type="button" class="tab-btn is-active" role="tab" aria-selected="true" data-panel="missions">Missões</button>
         <button type="button" class="tab-btn" role="tab" aria-selected="false" data-panel="achievements">Conquistas</button>
@@ -208,6 +284,7 @@
           <!-- script.js renderiza o log de atividades aqui -->
         </ul>
       </section>
+      </div>
     </aside>
   </div>
 
@@ -220,6 +297,11 @@
 
       <h2 id="drawer-node-name" class="font-display">—</h2>
       <p id="drawer-node-description" class="drawer-description">—</p>
+
+      <div class="drawer-resources" id="drawer-resources" hidden>
+        <p class="stat-caption">Recursos Recomendados</p>
+        <ul class="resources-list" id="resources-list"></ul>
+      </div>
 
       <div class="drawer-stat">
         <div class="drawer-stat-header">
@@ -258,6 +340,24 @@
           <button type="button" class="btn-kp-negative" data-kp="-5">-05 KP</button>
           <button type="button" class="btn-kp-negative" data-kp="-10">-10 KP</button>
         </div>
+      </div>
+
+      <div class="drawer-deliverables" id="drawer-deliverables" hidden>
+        <p class="stat-caption">Checklist de Entrega</p>
+        <ul class="deliverables-list" id="deliverables-list"></ul>
+      </div>
+
+      <div class="drawer-portfolio" id="drawer-portfolio" hidden>
+        <p class="stat-caption">Link do Portfólio</p>
+        <input type="url" id="portfolio-url-input" class="portfolio-input" placeholder="https://github.com/seu-usuario/seu-projeto" maxlength="300">
+      </div>
+
+      <div class="drawer-notes">
+        <div class="stat-caption-row">
+          <p class="stat-caption">Minhas Anotações</p>
+          <span class="notes-char-count" id="notes-char-count">0/600</span>
+        </div>
+        <textarea id="notes-textarea" class="notes-textarea" maxlength="600" placeholder="O que você aprendeu aqui, dúvidas, links que você mesmo achou..."></textarea>
       </div>
 
       <button type="button" id="btn-reset-node" class="btn-danger btn-reset-node">Reiniciar esta habilidade</button>
@@ -335,6 +435,24 @@
       <h2 id="celebration-title" class="font-display">Categoria Completa!</h2>
       <p id="celebration-subtitle" class="celebration-subtitle">—</p>
       <button type="button" id="btn-close-celebration" class="btn-primary">Continuar</button>
+    </div>
+  </div>
+
+  <!-- =================================================================
+       ONBOARDING — só na primeira visita (guardado em UI_PREFS_KEY)
+       ================================================================= -->
+  <div class="drawer-overlay" id="onboarding-overlay" hidden>
+    <div class="drawer onboarding-modal" id="onboarding-modal" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+      <h2 id="onboarding-title" class="font-display">Bem-vindo ao Compendium</h2>
+      <p class="drawer-description">Um guia rápido antes de começar:</p>
+      <ul class="onboarding-list">
+        <li><strong>XP</strong> mede o quanto você praticou uma habilidade — sobe o Nível do nó (0–10) e, com ele, seu Nível Global e Rank.</li>
+        <li><strong>KP</strong> (Conhecimento) é uma medida à parte, sem teto — não entra em nenhum cálculo de nível, é só sua.</li>
+        <li>A ordem sugerida entre habilidades é uma <strong>dica</strong>, nunca um bloqueio — pode estudar fora de ordem sempre que quiser.</li>
+        <li>Nós com anel dourado são <strong>Marcos Principais</strong> — projetos práticos que fecham cada trilha.</li>
+        <li><strong>Especializações</strong> avançadas desbloqueiam no Rank Sênior (nível global 50).</li>
+      </ul>
+      <button type="button" id="btn-close-onboarding" class="btn-primary">Entendi, vamos começar</button>
     </div>
   </div>
 

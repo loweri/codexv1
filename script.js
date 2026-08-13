@@ -17,6 +17,9 @@
   // 1. CONSTANTES
   // =====================================================================
   const STORAGE_KEY = 'codex_state_v2';
+  // Preferências de UI (painéis retraídos etc.) — chave própria, separada do
+  // progresso, pra Exportar/Importar/Reiniciar nunca mexerem em layout.
+  const UI_PREFS_KEY = 'codex_ui_prefs_v1';
   const MAX_NODE_LEVEL = 10;
 
   const RANKS = [
@@ -116,8 +119,19 @@
     return next ? ('Próximo: ' + next.name) : 'Nível máximo alcançado';
   }
 
-  function specializationsUnlocked() {
-    return globalLevel() >= 50;
+  // Regra trocada por decisão consciente (era: nível global >= 50 liberava
+  // TODAS as especializações de TODAS as categorias de uma vez — exigia em
+  // média ~79% de mastery nos 62 nós do núcleo antes de ver qualquer uma).
+  // Agora é por categoria: dominar o boss DAQUELA categoria já libera as
+  // especializações dela, sem depender do resto da árvore.
+  function specializationsUnlockedForCategory(categoryId) {
+    const boss = DATA.skills.find(function (s) { return s.category === categoryId && s.isBoss; });
+    if (!boss) return false;
+    return nodeLevelFromXp(getNodeState(boss.id).xp, getWeight(boss)) >= MAX_NODE_LEVEL;
+  }
+
+  function anySpecializationUnlocked() {
+    return DATA.categories.some(function (c) { return specializationsUnlockedForCategory(c.id); });
   }
 
   // =====================================================================
@@ -136,7 +150,10 @@
       notifiedPrereq: {},    // { skillId: true } — já mostrou popup de sugestão
       weeklyGoal: 200,        // meta de XP por semana (editável pelo usuário)
       categoriesCelebrated: {}, // { categoryId: true } — já mostrou o modal de celebração
-      weeklyGoalCelebratedAt: 0  // timestamp da última celebração de meta semanal
+      weeklyGoalCelebratedAt: 0,  // timestamp da última celebração de meta semanal
+      totalStudySeconds: 0    // soma de TODAS as sessões já encerradas — só cresce,
+                               // nunca é recalculado a partir do history[] (que tem
+                               // teto de 500 itens e apagaria sessões antigas).
     };
   }
 
@@ -213,6 +230,35 @@
     }, 0);
   }
 
+  // =====================================================================
+  // ATRIBUTOS RPG
+  // Uma fórmula só pra todos os 5 — nasce em 10 (mediano) e sobe até 20
+  // conforme a média de progresso das categorias associadas chega em 100%.
+  // Mapeamento aprovado:
+  //   INT = Fundamentos + Banco de Dados   (raciocínio lógico, modelagem)
+  //   DEX = Programação + DevOps           (agilidade técnica, ferramentas)
+  //   CON = Engenharia de Dados + Cloud     (robustez de pipeline/infra)
+  //   WIS = Visualização                    (percepção, traduzir dado em insight)
+  //   CHA = Soft Skills                     (comunicação)
+  // =====================================================================
+  const ATTRIBUTE_CATEGORIES = {
+    INT: ['fundamentos', 'banco-dados'],
+    DEX: ['programacao', 'devops'],
+    CON: ['engenharia-dados', 'cloud'],
+    WIS: ['visualizacao'],
+    CHA: ['soft-skills']
+  };
+
+  function computeAttributes() {
+    const result = {};
+    Object.keys(ATTRIBUTE_CATEGORIES).forEach(function (attr) {
+      const cats = ATTRIBUTE_CATEGORIES[attr];
+      const avgProgress = cats.reduce(function (sum, catId) { return sum + categoryProgressPercent(catId); }, 0) / cats.length;
+      result[attr] = 10 + Math.round(avgProgress / 10);
+    });
+    return result;
+  }
+
   // Nível Global = soma de Node Levels do núcleo (÷10) + bônus de conquistas
   // convertido à mesma escala (55 XP ≈ custo médio de 1 nível na curva, ver
   // PROMPT_BASE.md seção 6.2: 550 XP / 10 níveis = 55 XP/nível em média).
@@ -255,7 +301,7 @@
     const mastered = level >= MAX_NODE_LEVEL;
 
     let stateClass;
-    if (skill.isSpecialization && !specializationsUnlocked()) {
+    if (skill.isSpecialization && !specializationsUnlockedForCategory(skill.category)) {
       stateClass = 'locked';
     } else if (mastered) {
       stateClass = 'mastered';
@@ -277,8 +323,9 @@
   // mouse não "vaze" pra dentro de outro galho: as outras categorias
   // simplesmente não existem no DOM enquanto não são a categoria ativa.
   function computeLayout(categoryId) {
+    const unlocked = specializationsUnlockedForCategory(categoryId);
     const skills = skillsByCategory(categoryId).filter(function (s) {
-      return !s.isSpecialization || specializationsUnlocked();
+      return !s.isSpecialization || unlocked;
     });
 
     const rootX = MARGIN_LEFT;
@@ -418,6 +465,24 @@
     focal = { x: layoutCache.rootX, y: layoutCache.rootY };
     applyTransform();
     updateCategoryTabs();
+    renderCharacterSheet(); // status de especializações agora é por categoria — precisa atualizar ao trocar de aba
+  }
+
+  // Ação do botão "Ver Especializações" — pana/foca no ramo de especialização
+  // da categoria atualmente aberta (o botão não sabe de categoria por conta
+  // própria, vive na ficha do personagem, então usa a aba ativa no momento).
+  function revealSpecializations() {
+    if (!specializationsUnlockedForCategory(currentCategoryId)) return;
+    const cat = DATA.categories.find(function (c) { return c.id === currentCategoryId; });
+    const specs = DATA.skills.filter(function (s) { return s.category === currentCategoryId && s.isSpecialization; });
+    if (specs.length === 0) return;
+    const positions = specs.map(function (s) { return layoutCache.nodePositions[s.id]; }).filter(Boolean);
+    if (positions.length === 0) return;
+    const avgX = positions.reduce(function (sum, p) { return sum + p.x; }, 0) / positions.length;
+    const avgY = positions.reduce(function (sum, p) { return sum + p.y; }, 0) / positions.length;
+    focal = { x: avgX, y: avgY };
+    applyTransform();
+    showToast('🔍 Mostrando as especializações de ' + cat.name + '.', 'suggestion');
   }
 
   function setupZoomPanControls() {
@@ -495,6 +560,43 @@
   // =====================================================================
   let activeDrawerSkillId = null;
 
+  // Anotações — chave própria (NOTES_KEY), separada do progresso: não entram
+  // em Exportar/Importar/Reiniciar, que continuam só sobre XP/KP/missões/etc.
+  const NOTES_KEY = 'codex_notes_v1';
+  const NOTES_CHAR_LIMIT = 600;
+  let notes = {};
+  let notesSaveTimeout = null;
+
+  function loadNotes() {
+    try {
+      const raw = localStorage.getItem(NOTES_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function flushNotesSave() {
+    clearTimeout(notesSaveTimeout);
+    try {
+      localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+    } catch (e) {
+      showToast('Não foi possível salvar a anotação — armazenamento local indisponível.', 'warning');
+    }
+  }
+
+  function saveNotesDebounced() {
+    clearTimeout(notesSaveTimeout);
+    notesSaveTimeout = setTimeout(flushNotesSave, 500);
+  }
+
+  function updateNotesCharCount(len) {
+    const el = document.getElementById('notes-char-count');
+    if (!el) return;
+    el.textContent = len + '/' + NOTES_CHAR_LIMIT;
+    el.classList.toggle('is-near-limit', len >= NOTES_CHAR_LIMIT - 50);
+  }
+
   function openDrawer(skillId) {
     const skill = skillsById[skillId];
     if (!skill) return;
@@ -515,6 +617,7 @@
   }
 
   function closeDrawer() {
+    flushNotesSave();
     document.getElementById('drawer-overlay').hidden = true;
     activeDrawerSkillId = null;
   }
@@ -533,6 +636,79 @@
     document.getElementById('drawer-xp-bar').classList.toggle('mastered', level >= MAX_NODE_LEVEL);
     document.getElementById('drawer-kp-value').textContent = ns.kp;
     document.getElementById('drawer-kp-bar').style.width = kpProgressPercent(ns.kp) + '%';
+
+    // Recursos recomendados — curados por nó, só aparece quem tem
+    const resourcesBlock = document.getElementById('drawer-resources');
+    if (skill.resources && skill.resources.length > 0) {
+      document.getElementById('resources-list').innerHTML = skill.resources.map(function (r) {
+        return '<li><a href="' + r.url + '" target="_blank" rel="noopener noreferrer">' + r.label + '</a></li>';
+      }).join('');
+      resourcesBlock.hidden = false;
+    } else {
+      resourcesBlock.hidden = true;
+    }
+
+    // Checklist de entrega — só nós is-boss que tiverem deliverables definidos
+    const deliverablesBlock = document.getElementById('drawer-deliverables');
+    if (skill.isBoss && skill.deliverables && skill.deliverables.length > 0) {
+      const checked = ns.checkedDeliverables || [];
+      document.getElementById('deliverables-list').innerHTML = skill.deliverables.map(function (item, i) {
+        const isChecked = !!checked[i];
+        return '<li><label class="deliverable-item' + (isChecked ? ' is-checked' : '') + '">' +
+          '<input type="checkbox" data-deliverable-index="' + i + '"' + (isChecked ? ' checked' : '') + '>' +
+          '<span>' + item + '</span></label></li>';
+      }).join('');
+      deliverablesBlock.hidden = false;
+    } else {
+      deliverablesBlock.hidden = true;
+    }
+
+    // Link de portfólio — nós is-boss e especializações (onde faz sentido ter "algo pra mostrar")
+    const portfolioBlock = document.getElementById('drawer-portfolio');
+    if (skill.isBoss || skill.isSpecialization) {
+      document.getElementById('portfolio-url-input').value = ns.portfolioUrl || '';
+      portfolioBlock.hidden = false;
+    } else {
+      portfolioBlock.hidden = true;
+    }
+
+    // Anotações — todos os nós, vêm do storage separado (notes), não de state
+    const notesText = notes[skill.id] || '';
+    document.getElementById('notes-textarea').value = notesText;
+    updateNotesCharCount(notesText.length);
+  }
+
+  // Desfazer — cobre só o último +/- XP ou KP (não missões nem conquistas,
+  // que têm efeito em cascata e complicariam demais um "ops, cliquei errado").
+  let lastAction = null; // { skillId, type: 'xp'|'kp', delta }
+
+  function updateUndoButton() {
+    const btn = document.getElementById('btn-undo');
+    if (!btn) return;
+    if (!lastAction) {
+      btn.disabled = true;
+      btn.title = 'Desfaz o último +/- XP ou KP';
+      btn.setAttribute('aria-label', 'Desfazer último lançamento');
+      return;
+    }
+    const skill = skillsById[lastAction.skillId];
+    const sign = lastAction.delta > 0 ? '+' : '';
+    const description = 'Desfazer: ' + sign + lastAction.delta + ' ' + lastAction.type.toUpperCase() + ' em ' + (skill ? skill.name : '?');
+    btn.disabled = false;
+    btn.title = description;
+    btn.setAttribute('aria-label', description);
+  }
+
+  function undoLastAction() {
+    if (!lastAction) return;
+    const action = lastAction;
+    if (action.type === 'xp') applyXpChange(action.skillId, -action.delta);
+    else applyKpChange(action.skillId, -action.delta);
+    const skill = skillsById[action.skillId];
+    showToast('↺ Desfeito: ' + (action.delta > 0 ? '+' : '') + action.delta + ' ' + action.type.toUpperCase() + ' em ' + (skill ? skill.name : '?'), 'success');
+    lastAction = null; // não permite desfazer o desfazer — mantém simples
+    updateUndoButton();
+    if (activeDrawerSkillId) renderDrawer();
   }
 
   function applyXpChange(skillId, delta) {
@@ -543,6 +719,8 @@
     ns.xp = Math.max(0, Math.min(cap, ns.xp + delta));
     logHistory('xp', skill.name, (delta > 0 ? '+' : '') + delta + ' XP');
     registerActivityToday();
+    lastAction = { skillId: skillId, type: 'xp', delta: delta };
+    updateUndoButton();
     afterStateChange();
   }
 
@@ -551,8 +729,13 @@
     if (!skill) return;
     const ns = getNodeState(skillId);
     ns.kp = Math.max(0, ns.kp + delta); // KP sem teto (PROMPT_BASE.md seção 6.4)
+    ns.lastKpTs = Date.now(); // guardado no próprio nó — history tem teto de
+    // 500 itens e pode "esquecer" esse KP antigo mesmo com o valor (sem teto)
+    // ainda ali; isso é o que causava "Infinityd" na fila de revisão.
     logHistory('kp', skill.name, (delta > 0 ? '+' : '') + delta + ' KP');
     registerActivityToday();
+    lastAction = { skillId: skillId, type: 'kp', delta: delta };
+    updateUndoButton();
     afterStateChange();
   }
 
@@ -563,6 +746,7 @@
     if (!skill) return;
     if (!window.confirm('Reiniciar "' + skill.name + '"? Isso zera o XP e o KP só desta habilidade.')) return;
     state.nodes[skillId] = { xp: 0, kp: 0 };
+    if (lastAction && lastAction.skillId === skillId) { lastAction = null; updateUndoButton(); }
     logHistory('node-reset', skill.name, 'Habilidade reiniciada');
     afterStateChange();
     renderDrawer();
@@ -588,6 +772,35 @@
     document.getElementById('btn-reset-node').addEventListener('click', function () {
       resetNode(activeDrawerSkillId);
     });
+
+    // Checklist — delegado no container, já que a lista inteira é recriada
+    // a cada renderDrawer() (senão os listeners diretos se perderiam).
+    document.getElementById('deliverables-list').addEventListener('change', function (e) {
+      const checkbox = e.target.closest('[data-deliverable-index]');
+      if (!checkbox || !activeDrawerSkillId) return;
+      const idx = parseInt(checkbox.dataset.deliverableIndex, 10);
+      const ns = getNodeState(activeDrawerSkillId);
+      if (!ns.checkedDeliverables) ns.checkedDeliverables = [];
+      ns.checkedDeliverables[idx] = checkbox.checked;
+      checkbox.closest('.deliverable-item').classList.toggle('is-checked', checkbox.checked);
+      saveState();
+    });
+
+    // Portfólio — salva ao digitar, sem disparar o re-render pesado de afterStateChange()
+    document.getElementById('portfolio-url-input').addEventListener('input', function (e) {
+      if (!activeDrawerSkillId) return;
+      getNodeState(activeDrawerSkillId).portfolioUrl = e.target.value;
+      saveState();
+    });
+
+    // Notas — storage separado (notes), com debounce pra não escrever no
+    // localStorage a cada tecla
+    document.getElementById('notes-textarea').addEventListener('input', function (e) {
+      if (!activeDrawerSkillId) return;
+      notes[activeDrawerSkillId] = e.target.value;
+      updateNotesCharCount(e.target.value.length);
+      saveNotesDebounced();
+    });
   }
 
   // =====================================================================
@@ -609,12 +822,23 @@
   // =====================================================================
   // 13. CONQUISTAS
   // =====================================================================
+  // Nó com XP máximo (nível 10) E KP alto no mesmo nó — diferencia quem só
+  // "bateu os botões" de quem voltou várias vezes pra reforçar de verdade.
+  const DEEP_MASTERY_KP_THRESHOLD = 100;
+
+  function deepMasteryCount() {
+    return coreSkills().filter(function (s) {
+      const ns = getNodeState(s.id);
+      return nodeLevelFromXp(ns.xp, getWeight(s)) >= MAX_NODE_LEVEL && ns.kp >= DEEP_MASTERY_KP_THRESHOLD;
+    }).length;
+  }
+
   function evaluateCondition(conditionStr) {
     try {
       // Conditions vêm de data-embedded.js (arquivo confiável do próprio projeto,
       // não de entrada do usuário) — Function() é aceitável aqui, escopo controlado.
       const fn = new Function(
-        'streak', 'rank', 'totalXp', 'daysActive', 'categoryProgress', 'specializationComplete',
+        'streak', 'rank', 'totalXp', 'daysActive', 'categoryProgress', 'specializationComplete', 'totalHours', 'deepMasteryCount',
         'return (' + conditionStr + ');'
       );
       return !!fn(
@@ -623,7 +847,9 @@
         totalXpForAchievements(),
         daysActiveCount(),
         categoryProgressPercent,
-        specializationComplete
+        specializationComplete,
+        (state.totalStudySeconds || 0) / 3600,
+        deepMasteryCount()
       );
     } catch (e) {
       console.error('Condição de conquista inválida:', conditionStr, e);
@@ -723,6 +949,27 @@
     return c ? c.name : categoryId;
   }
 
+  const RECURRING_RESET_MS = 7 * 24 * 60 * 60 * 1000; // 7 dias — mesma cadência
+  // da própria missão semente ("Revisão Semanal: Docker"), que é o único
+  // exemplo de recorrência que já existia no projeto antes desta função.
+
+  // Roda no carregamento do app: qualquer missão recorrente concluída há 7+
+  // dias volta pra "Pendente", pronta pra fazer de novo. Não reaplica XP/KP
+  // sozinha — a recompensa só volta quando o usuário clicar "Concluir" de novo.
+  function checkRecurringMissions() {
+    const now = Date.now();
+    let anyReset = false;
+    state.missions.forEach(function (m) {
+      if (m.recurring && m.status === 'concluida' && m.completedAt && (now - m.completedAt) >= RECURRING_RESET_MS) {
+        m.status = 'pendente';
+        delete m.completedAt;
+        logHistory('mission', m.name, 'Missão recorrente disponível de novo');
+        anyReset = true;
+      }
+    });
+    return anyReset;
+  }
+
   function handleMissionAction(action, missionId) {
     const mission = state.missions.find(function (m) { return m.id === missionId; });
     if (!mission) return;
@@ -732,10 +979,17 @@
       logHistory('mission', mission.name, 'Missão iniciada');
     } else if (action === 'concluir') {
       mission.status = 'concluida';
+      mission.completedAt = Date.now();
       (mission.linkedNodes || []).forEach(function (n) {
         applyXpChange(n.skillId, n.xp || 0);
         if (n.kp) applyKpChange(n.skillId, n.kp);
       });
+      // "Desfazer" só cobre um clique isolado de XP/KP — depois de uma
+      // missão (que pode mexer em vários nós de uma vez), desfazer só o
+      // último pedaço deixaria status "concluída" com recompensa pela
+      // metade. Mais seguro desabilitar aqui do que arriscar isso.
+      lastAction = null;
+      updateUndoButton();
       logHistory('mission', mission.name, 'Missão concluída');
       showToast('✅ Missão concluída: ' + mission.name, 'success');
     } else if (action === 'remover') {
@@ -907,6 +1161,21 @@
     return '<div class="heatmap-grid">' + weeksHtml + '</div>';
   }
 
+  // Nó cujo KP não sobe há X dias — usa KP especificamente (não XP), porque
+  // a ideia aqui é sinalizar retenção/revisão, não volume de prática.
+  const KP_REVIEW_THRESHOLD_DAYS = 7;
+
+  function kpReviewQueue() {
+    return coreSkills()
+      .filter(function (s) { return getNodeState(s.id).kp > 0 && getNodeState(s.id).lastKpTs; })
+      // ^ progresso de antes desse campo existir não teria lastKpTs ainda —
+      // melhor não aparecer na fila do que mostrar um número inventado.
+      // Volta a aparecer sozinho assim que receber o próximo +/- KP.
+      .map(function (s) { return { skill: s, days: daysSince(getNodeState(s.id).lastKpTs) }; })
+      .filter(function (x) { return x.days >= KP_REVIEW_THRESHOLD_DAYS; })
+      .sort(function (a, b) { return b.days - a.days; });
+  }
+
   function renderStats() {
     const el = document.getElementById('stats-content');
     const now = Date.now();
@@ -925,12 +1194,24 @@
         '</div>';
     }).join('');
 
+    const queue = kpReviewQueue();
+    const queueHtml = queue.length === 0
+      ? '<p class="empty-state">Nada pra revisar agora — ou ainda não tem KP suficiente registrado nos nós.</p>'
+      : '<ul class="review-queue-list">' + queue.slice(0, 8).map(function (item) {
+          return '<li><button type="button" class="review-queue-item" data-skill-id="' + item.skill.id + '">' +
+            '<span>' + item.skill.name + '</span>' +
+            '<span class="font-mono">' + item.days + 'd</span>' +
+            '</button></li>';
+        }).join('') + '</ul>';
+
     el.innerHTML =
       '<div class="stat-summary">' +
       '<div><span class="font-mono">' + globalLevel() + '</span><br>Nível Global</div>' +
       '<div><span class="font-mono">' + rankForLevel(globalLevel()) + '</span><br>Rank</div>' +
       '<div><span class="font-mono">' + state.streak.current + '</span><br>Streak (dias)</div>' +
       '</div>' +
+      '<h3>Horas Totais de Estudo <span class="stat-hint">(soma de todas as sessões encerradas)</span></h3><p class="font-mono">' + formatDuration(state.totalStudySeconds || 0) + '</p>' +
+      '<h3>Fila de Revisão <span class="stat-hint">(KP parado há ' + KP_REVIEW_THRESHOLD_DAYS + '+ dias)</span></h3>' + queueHtml +
       '<h3>Últimos 7 dias</h3><p class="font-mono">' + week.xp + ' XP · ' + week.kp + ' KP</p>' +
       '<h3>Últimos 30 dias</h3><p class="font-mono">' + month.xp + ' XP · ' + month.kp + ' KP</p>' +
       '<h3>XP de conquistas acumulado</h3><p class="font-mono">' + (state.bonusXp || 0) + ' XP <span class="stat-hint">(bônus Bronze/Prata/Ouro)</span></p>' +
@@ -966,6 +1247,17 @@
     document.querySelectorAll('.tab-btn').forEach(function (btn) {
       btn.addEventListener('click', function () { switchSidePanel(btn.dataset.panel); });
     });
+
+    // Fila de revisão fica dentro de #stats-content, que é recriado a cada
+    // renderStats() — delegar no container estável evita perder o listener.
+    document.getElementById('stats-content').addEventListener('click', function (e) {
+      const item = e.target.closest('.review-queue-item');
+      if (!item) return;
+      const skill = skillsById[item.dataset.skillId];
+      if (!skill) return;
+      focusCategory(skill.category);
+      openDrawer(skill.id);
+    });
   }
 
   function switchSidePanel(panelName) {
@@ -994,11 +1286,12 @@
     document.getElementById('global-xp-bar').style.width = pctWithinLevel + '%';
     document.getElementById('next-rank-label').textContent = nextRankLabel(level);
 
-    const unlocked = specializationsUnlocked();
-    document.getElementById('specialization-status').textContent = unlocked
-      ? 'Desbloqueadas — bom trabalho, Sênior.'
-      : 'Bloqueadas até Rank Sênior (nível 50)';
-    document.getElementById('btn-specializations').disabled = !unlocked;
+    const cat = DATA.categories.find(function (c) { return c.id === currentCategoryId; });
+    const catUnlocked = specializationsUnlockedForCategory(currentCategoryId);
+    document.getElementById('specialization-status').textContent = catUnlocked
+      ? ('Desbloqueadas para ' + cat.name + ' — bom trabalho!')
+      : ('Bloqueadas até completar o Marco Principal de ' + cat.name);
+    document.getElementById('btn-specializations').disabled = !catUnlocked;
   }
 
   // =====================================================================
@@ -1080,28 +1373,177 @@
   // =====================================================================
   // 18.2 RECOMENDAÇÃO DE SKILL ("O que estudar hoje?")
   // =====================================================================
+  function daysSince(ts) {
+    if (!ts) return Infinity;
+    return Math.floor((Date.now() - ts) / 86400000);
+  }
+
+  // history guarda o NOME da skill (não o id) no campo label — mesmo jeito
+  // que logHistory('xp', skill.name, ...) grava. history é unshift (mais
+  // recente primeiro), então o primeiro match já é o mais recente.
+  function lastTouchedTs(skillName) {
+    for (let i = 0; i < state.history.length; i++) {
+      const h = state.history[i];
+      if ((h.type === 'xp' || h.type === 'kp') && h.label === skillName) return h.ts;
+    }
+    return null;
+  }
+
+  // Acrescenta um empurrão de urgência na mensagem se ainda não estudou
+  // hoje, já é fim de tarde, e existe uma streak (ou já é dia de começar uma).
+  function streakAtRiskSuffix() {
+    const today = new Date().toDateString();
+    if (state.streak.lastDate === today) return '';
+    if (new Date().getHours() < 17) return '';
+    return state.streak.current > 0
+      ? (' Sua streak de ' + state.streak.current + ' dias ainda dá pra manter hoje.')
+      : '';
+  }
+
   function recommendSkill() {
-    // Prioriza nós do núcleo já "active" (disponíveis, não bloqueados) com
-    // o MENOR XP acumulado — ou seja, o que está mais perto de "só começar".
-    const candidates = coreSkills().filter(function (s) {
+    const activeCore = coreSkills().filter(function (s) {
       return computeNodeVisual(s).stateClass === 'active';
     });
 
-    if (candidates.length === 0) {
+    if (activeCore.length === 0) {
       showToast('🎉 Tudo que está disponível agora já foi masterizado — parabéns!', 'achievement');
       return;
     }
 
-    candidates.sort(function (a, b) { return getNodeState(a.id).xp - getNodeState(b.id).xp; });
-    const pick = candidates[0];
+    const activeById = {};
+    activeCore.forEach(function (s) { activeById[s.id] = s; });
+
+    // 1) Missão com prazo em até 3 dias cujo nó vinculado já está disponível
+    //    agora — evita perder prazo por simplesmente não saber o que priorizar.
+    const now = Date.now();
+    const urgent = state.missions
+      .filter(function (m) { return (m.status === 'pendente' || m.status === 'em_andamento') && m.deadline; })
+      .map(function (m) {
+        const days = Math.ceil((new Date(m.deadline).getTime() - now) / 86400000);
+        const linkedActive = (m.linkedNodes || []).map(function (n) { return activeById[n.skillId]; }).filter(Boolean);
+        return { mission: m, days: days, linkedActive: linkedActive };
+      })
+      .filter(function (x) { return x.linkedActive.length > 0 && x.days <= 3; })
+      .sort(function (a, b) { return a.days - b.days; });
+
+    if (urgent.length > 0) {
+      const top = urgent[0];
+      const pick = top.linkedActive[0];
+      const dayLabel = top.days <= 0 ? 'vence hoje' : ('vence em ' + top.days + ' dia' + (top.days > 1 ? 's' : ''));
+      focusCategory(pick.category);
+      openDrawer(pick.id);
+      showToast('🎯 A missão "' + top.mission.name + '" ' + dayLabel + ' — "' + pick.name + '" é o próximo passo.' + streakAtRiskSuffix(), 'suggestion');
+      return;
+    }
+
+    // 2) Nó já começado (XP > 0) que esfriou (5+ dias sem receber XP/KP) —
+    //    prioriza retomar o que já estava em andamento antes de abrir algo novo.
+    const cooling = activeCore
+      .filter(function (s) { return getNodeState(s.id).xp > 0; })
+      .map(function (s) { return { skill: s, days: daysSince(lastTouchedTs(s.name)) }; })
+      .filter(function (x) { return x.days >= 5; })
+      .sort(function (a, b) { return b.days - a.days; });
+
+    if (cooling.length > 0) {
+      const pick = cooling[0].skill;
+      focusCategory(pick.category);
+      openDrawer(pick.id);
+      showToast('🎯 Faz ' + cooling[0].days + ' dias que "' + pick.name + '" não recebe atenção — bom retomar antes de esfriar de vez.' + streakAtRiskSuffix(), 'suggestion');
+      return;
+    }
+
+    // 3) Fallback original: entre os disponíveis, o de MENOR XP acumulado
+    //    — ou seja, o que está mais perto de "só começar".
+    activeCore.sort(function (a, b) { return getNodeState(a.id).xp - getNodeState(b.id).xp; });
+    const pick = activeCore[0];
 
     focusCategory(pick.category); // síncrono — já deixa o nó pronto no DOM
     openDrawer(pick.id);
-    showToast('🎯 Sugestão de hoje: "' + pick.name + '" — bom ponto pra continuar.', 'suggestion');
+    showToast('🎯 Sugestão de hoje: "' + pick.name + '" — bom ponto pra continuar.' + streakAtRiskSuffix(), 'suggestion');
   }
 
   function setupRecommendation() {
     document.getElementById('btn-recommend-skill').addEventListener('click', recommendSkill);
+  }
+
+  // Reposiciona o botão flutuante relativo à borda real do tree-viewport
+  // (não um left fixo) — assim ele nunca cobre os painéis laterais (o problema
+  // original) nem fica cortado pelo overflow:hidden do canvas quando a coluna
+  // da árvore está estreita (o que aconteceria se ele vivesse position:absolute
+  // ali dentro). position:fixed escapa de qualquer overflow:hidden ancestral,
+  // então só precisa saber ONDE ficar — isso quem calcula é este JS.
+  function positionRecommendButton() {
+    const btn = document.getElementById('btn-recommend-skill');
+    if (!btn) return;
+    const rect = treeViewport.getBoundingClientRect();
+    btn.style.left = (rect.left + 24) + 'px';
+  }
+
+  // =====================================================================
+  // 18.3 PAINÉIS RETRÁTEIS
+  // QoL pra tela dividida: recolhe ficha/painel lateral pra faixas finas de
+  // 44px, liberando espaço pra árvore. Preferência própria (UI_PREFS_KEY),
+  // separada do progresso — Exportar/Importar/Reiniciar não tocam nisso.
+  // =====================================================================
+  let uiPrefs = { leftCollapsed: false, rightCollapsed: false, notificationsEnabled: false, onboardingSeen: false, theme: 'dark' };
+
+  function loadUiPrefs() {
+    try {
+      const raw = localStorage.getItem(UI_PREFS_KEY);
+      return raw ? Object.assign({ leftCollapsed: false, rightCollapsed: false, notificationsEnabled: false, onboardingSeen: false, theme: 'dark' }, JSON.parse(raw)) : { leftCollapsed: false, rightCollapsed: false, notificationsEnabled: false, onboardingSeen: false, theme: 'dark' };
+    } catch (e) {
+      return { leftCollapsed: false, rightCollapsed: false, notificationsEnabled: false, onboardingSeen: false, theme: 'dark' };
+    }
+  }
+
+  function saveUiPrefs() {
+    try {
+      localStorage.setItem(UI_PREFS_KEY, JSON.stringify(uiPrefs));
+    } catch (e) {
+      // Preferência de layout não é crítica o bastante pra interromper com um toast.
+    }
+  }
+
+  function applySidebarState() {
+    const appLayout = document.querySelector('.app-layout');
+    appLayout.classList.toggle('left-collapsed', uiPrefs.leftCollapsed);
+    appLayout.classList.toggle('right-collapsed', uiPrefs.rightCollapsed);
+
+    const btnLeft = document.getElementById('btn-toggle-left');
+    btnLeft.textContent = uiPrefs.leftCollapsed ? '›' : '‹';
+    btnLeft.setAttribute('aria-expanded', String(!uiPrefs.leftCollapsed));
+    btnLeft.setAttribute('aria-label', uiPrefs.leftCollapsed ? 'Expandir ficha do personagem' : 'Recolher ficha do personagem');
+
+    const btnRight = document.getElementById('btn-toggle-right');
+    btnRight.textContent = uiPrefs.rightCollapsed ? '‹' : '›';
+    btnRight.setAttribute('aria-expanded', String(!uiPrefs.rightCollapsed));
+    btnRight.setAttribute('aria-label', uiPrefs.rightCollapsed ? 'Expandir painel lateral' : 'Recolher painel lateral');
+  }
+
+  function setupSidebarToggles() {
+    uiPrefs = loadUiPrefs();
+    applySidebarState();
+
+    // A árvore só recalcula o zoom/pan depois que a coluna termina de
+    // animar — usar o retângulo do canvas ANTES da transição acabar
+    // deixaria o nó raiz descentralizado por um frame.
+    document.querySelector('.app-layout').addEventListener('transitionend', function (e) {
+      if (e.propertyName === 'grid-template-columns') {
+        applyTransform();
+        positionRecommendButton();
+      }
+    });
+
+    document.getElementById('btn-toggle-left').addEventListener('click', function () {
+      uiPrefs.leftCollapsed = !uiPrefs.leftCollapsed;
+      saveUiPrefs();
+      applySidebarState();
+    });
+    document.getElementById('btn-toggle-right').addEventListener('click', function () {
+      uiPrefs.rightCollapsed = !uiPrefs.rightCollapsed;
+      saveUiPrefs();
+      applySidebarState();
+    });
   }
 
   // =====================================================================
@@ -1133,10 +1575,47 @@
   // 20. TIMERS (Pomodoro + Sessão)
   // Não iniciam sozinhos — ficam parados até o usuário clicar em "Iniciar".
   // =====================================================================
+  // Timers guardados como timestamp (accumulated + runningSince), não como
+  // "quantidade restante" que soma ±1 a cada disparo do setInterval — o
+  // navegador reduz DRASTICAMENTE a frequência desse disparo quando a aba
+  // fica fora de foco (throttling de economia de bateria; depois de ~1min
+  // some pra 1 disparo por minuto ou menos). Um timer "por tick" perderia
+  // tempo real toda vez a aba ficasse em segundo plano. Com accumulated +
+  // runningSince (Date.now()), o valor exibido é sempre recalculado a partir
+  // do relógio de verdade — não importa quantos ticks o navegador pulou,
+  // quando o próximo disparar (ou quando a aba volta ao foco) o número já
+  // vem certo, sem precisar "recuperar o atraso".
   const timers = {
-    pomodoro: { remaining: POMODORO_SECONDS, running: false, mode: 'countdown', started: false },
-    session: { remaining: 0, running: false, mode: 'countup', started: false }
+    pomodoro: { mode: 'countdown', totalSeconds: POMODORO_SECONDS, accumulated: 0, runningSince: null, started: false },
+    session: { mode: 'countup', totalSeconds: null, accumulated: 0, runningSince: null, started: false }
   };
+
+  function elapsedSeconds(t) {
+    const live = t.runningSince ? Math.floor((Date.now() - t.runningSince) / 1000) : 0;
+    return t.accumulated + live;
+  }
+
+  function displaySeconds(t) {
+    return t.mode === 'countdown' ? Math.max(0, t.totalSeconds - elapsedSeconds(t)) : elapsedSeconds(t);
+  }
+
+  function startOrResumeTimer(t) {
+    t.runningSince = Date.now();
+    t.started = true;
+  }
+
+  function pauseTimer(t) {
+    if (t.runningSince) {
+      t.accumulated += Math.floor((Date.now() - t.runningSince) / 1000);
+      t.runningSince = null;
+    }
+  }
+
+  function resetTimerState(t) {
+    t.accumulated = 0;
+    t.runningSince = null;
+    t.started = false;
+  }
 
   function formatTime(totalSeconds) {
     const s = Math.max(0, totalSeconds);
@@ -1145,8 +1624,22 @@
     return mm + ':' + ss;
   }
 
+  // Formata segundos longos (horas totais de estudo) como "Xh YYmin" —
+  // diferente de formatTime(), que é só pro relógio mm:ss dos timers.
+  // Sessões com menos de 1 minuto mostram segundos ("45s"), senão ficaria
+  // idêntico a "0min" de quem ainda não estudou nada.
+  function formatDuration(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds || 0));
+    if (s === 0) return '0min';
+    if (s < 60) return s + 's';
+    const h = Math.floor(s / 3600);
+    const mm = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
+    if (h === 0) return Math.floor(s / 60) + 'min';
+    return h + 'h ' + mm + 'min';
+  }
+
   function pauseButtonLabel(t) {
-    if (t.running) return 'Pausar';
+    if (t.runningSince) return 'Pausar';
     return t.started ? 'Retomar' : 'Iniciar';
   }
 
@@ -1156,51 +1649,288 @@
     if (pauseBtn) pauseBtn.textContent = pauseButtonLabel(t);
   }
 
+  function redrawTimer(key) {
+    const t = timers[key];
+    document.getElementById(key + '-value').textContent = formatTime(displaySeconds(t));
+  }
+
   function tickTimers() {
     ['pomodoro', 'session'].forEach(function (key) {
       const t = timers[key];
-      if (!t.running) return;
-      t.remaining = t.mode === 'countdown' ? Math.max(0, t.remaining - 1) : t.remaining + 1;
-      document.getElementById(key + '-value').textContent = formatTime(t.remaining);
-      if (key === 'pomodoro' && t.mode === 'countdown' && t.remaining === 0) {
-        t.running = false;
-        t.started = false;
+      if (!t.runningSince) return; // pausado ou nunca iniciado — nada novo a mostrar
+      const shown = displaySeconds(t);
+      document.getElementById(key + '-value').textContent = formatTime(shown);
+      if (key === 'pomodoro' && shown === 0) {
+        pauseTimer(t); // trava — Math.max(0, ...) em displaySeconds garante que não passa de 00:00 daqui pra frente
         updateTimerButton('pomodoro');
-        logHistory('session', 'Pomodoro concluído', '25 min de foco');
-        registerActivityToday();
         showToast('🍅 Pomodoro concluído — hora de uma pausa.', 'success');
-        renderHistory();
-        renderCharacterSheet(); // streak pode ter mudado
+        if (document.hidden) fireNotification('Pomodoro concluído 🍅', 'Hora de uma pausa.');
+      }
+    });
+    maybeNotifyStreakRisk();
+    renderStreakIndicator();
+  }
+
+  // Atualiza os dois lugares que mostram o total — topbar (sempre visível)
+  // e ficha do personagem. Chamado em afterStateChange() e no init().
+  function renderTotalHours() {
+    const label = formatDuration(state.totalStudySeconds || 0);
+    const topbarEl = document.getElementById('total-hours-value');
+    const sheetEl = document.getElementById('character-total-hours');
+    if (topbarEl) topbarEl.textContent = label;
+    if (sheetEl) sheetEl.textContent = label;
+  }
+
+  // Indicador de streak na topbar — 3 estados: neutro (ainda dá tempo),
+  // ativo (já estudou hoje), em risco (não estudou e já é fim de tarde).
+  // Mesmo limiar de "tarde" (17h) usado em streakAtRiskSuffix(), pra ficar
+  // consistente em vez de dois números diferentes espalhados pelo app.
+  function renderStreakIndicator() {
+    const el = document.getElementById('streak-indicator');
+    const countEl = document.getElementById('streak-count-topbar');
+    if (!el || !countEl) return;
+    countEl.textContent = state.streak.current;
+    const today = new Date().toDateString();
+    const studiedToday = state.streak.lastDate === today;
+    const isLate = new Date().getHours() >= 17;
+    el.classList.toggle('is-active', studiedToday);
+    el.classList.toggle('is-at-risk', !studiedToday && isLate && state.streak.current > 0);
+    el.title = studiedToday
+      ? ('Streak de ' + state.streak.current + ' dia' + (state.streak.current === 1 ? '' : 's') + ' — hoje já contou.')
+      : (isLate ? 'Ainda não estudou hoje — a streak está em risco.' : 'Ainda não estudou hoje.');
+  }
+
+  function renderAttributes() {
+    const attrs = computeAttributes();
+    Object.keys(attrs).forEach(function (key) {
+      const el = document.getElementById('attr-' + key);
+      if (el) el.textContent = attrs[key];
+    });
+  }
+
+  // [i] de atributos: hover funciona só de CSS (:hover/:focus-within); este
+  // toggle cobre toque em celular, onde hover não existe de verdade.
+  function setupInfoTooltips() {
+    document.querySelectorAll('.info-tooltip').forEach(function (tip) {
+      const btn = tip.querySelector('.info-icon');
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isOpen = tip.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', String(isOpen));
+        document.querySelectorAll('.info-tooltip.is-open').forEach(function (other) {
+          if (other !== tip) { other.classList.remove('is-open'); other.querySelector('.info-icon').setAttribute('aria-expanded', 'false'); }
+        });
+      });
+    });
+    document.addEventListener('click', function () {
+      document.querySelectorAll('.info-tooltip.is-open').forEach(function (tip) {
+        tip.classList.remove('is-open');
+        tip.querySelector('.info-icon').setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  // =====================================================================
+  // 18.4 NOTIFICAÇÕES DO NAVEGADOR (opt-in — desligado por padrão)
+  // =====================================================================
+  // =====================================================================
+  // 18.5 SELETOR DE TEMA (Manuscrito Arcano escuro ↔ Blueprint claro)
+  // As duas folhas de estilo já estão no <head> (ver index.html) — aqui só
+  // alterna qual está desabilitada. Preferência salva em uiPrefs (não em
+  // state), mesma lógica dos outros ajustes de UI.
+  // =====================================================================
+  function applyThemeChoice() {
+    const isLight = uiPrefs.theme === 'light';
+    const darkLink = document.getElementById('theme-dark-link');
+    const lightLink = document.getElementById('theme-light-link');
+    if (darkLink) darkLink.disabled = isLight;
+    if (lightLink) lightLink.disabled = !isLight;
+
+    const btn = document.getElementById('btn-theme-toggle');
+    if (btn) btn.textContent = isLight ? '🎨 Escuro' : '🎨 Claro';
+
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', isLight ? '#0e2c48' : '#0f0c09');
+  }
+
+  function setupThemeToggle() {
+    const btn = document.getElementById('btn-theme-toggle');
+    if (!btn) return;
+    applyThemeChoice(); // uiPrefs já foi carregado em setupSidebarToggles(), chamado antes deste na init()
+    btn.addEventListener('click', function () {
+      uiPrefs.theme = uiPrefs.theme === 'light' ? 'dark' : 'light';
+      saveUiPrefs();
+      applyThemeChoice();
+    });
+  }
+
+  // Menu ☰ — reúne o que não precisa de acesso imediato (notificações, tema,
+  // exportar/importar/backup/reiniciar). Sessão e Desfazer ficam de fora de
+  // propósito, por precisarem de acesso rápido.
+  function closeTopbarMenu() {
+    const dropdown = document.getElementById('topbar-menu-dropdown');
+    const btn = document.getElementById('btn-topbar-menu');
+    if (dropdown) dropdown.hidden = true;
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+  }
+
+  // Instalar app — em vez de depender do usuário achar o ícone do navegador
+  // (que tem cooldown de ~3 meses depois de dispensado uma vez, é
+  // inconsistente entre navegadores e fácil de não notar), a gente escuta o
+  // evento que o PRÓPRIO navegador dispara quando confirma que dá pra
+  // instalar, guarda ele, e só aí revela um botão dentro do app. Só aparece
+  // quando o navegador de fato confirmou — nunca promete o que não pode dar.
+  let deferredInstallPrompt = null;
+
+  function setupInstallPrompt() {
+    const btn = document.getElementById('btn-install-app');
+    if (!btn) return;
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault(); // segura o mini-infobar nativo do navegador
+      deferredInstallPrompt = e;
+      btn.hidden = false;
+    });
+
+    btn.addEventListener('click', function () {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.then(function (choice) {
+        if (choice.outcome === 'accepted') {
+          showToast('📲 Instalado — procure o ícone do Compendium no seu sistema.', 'success');
+        }
+        deferredInstallPrompt = null;
+        btn.hidden = true;
+      });
+    });
+
+    // Já instalado (aberto como app, não como aba) — não faz sentido oferecer
+    // de novo. matchMedia pode não existir em todo ambiente, daí a guarda.
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+      btn.hidden = true;
+    }
+    window.addEventListener('appinstalled', function () {
+      btn.hidden = true;
+      deferredInstallPrompt = null;
+    });
+  }
+
+  function setupTopbarMenu() {
+    const btn = document.getElementById('btn-topbar-menu');
+    const dropdown = document.getElementById('topbar-menu-dropdown');
+    if (!btn || !dropdown) return;
+
+    function positionDropdown() {
+      const rect = btn.getBoundingClientRect();
+      dropdown.style.top = (rect.bottom + 8) + 'px';
+      dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (dropdown.hidden) {
+        positionDropdown();
+        dropdown.hidden = false;
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        closeTopbarMenu();
+      }
+    });
+    // Clicar em qualquer item fecha o menu — padrão de dropdown comum,
+    // mesmo pros toggles (notificações/tema), que dá pra reabrir fácil.
+    dropdown.addEventListener('click', function (e) {
+      if (e.target.closest('.topbar-menu-item')) closeTopbarMenu();
+    });
+    document.addEventListener('click', function (e) {
+      if (!dropdown.hidden && !dropdown.contains(e.target) && e.target !== btn) closeTopbarMenu();
+    });
+    window.addEventListener('resize', function () {
+      if (!dropdown.hidden) positionDropdown();
+    });
+  }
+
+  function notificationsSupported() {
+    return typeof Notification !== 'undefined';
+  }
+
+  function requestNotificationPermission() {
+    if (!notificationsSupported()) return Promise.resolve('unsupported');
+    if (Notification.permission === 'granted' || Notification.permission === 'denied') {
+      return Promise.resolve(Notification.permission);
+    }
+    return Notification.requestPermission();
+  }
+
+  function fireNotification(title, body) {
+    if (!notificationsSupported() || Notification.permission !== 'granted') return;
+    try {
+      new Notification(title, { body: body });
+    } catch (e) {
+      // Alguns navegadores exigem Service Worker registrado pra notificação
+      // funcionar fora da aba em foco — falha aqui não deve quebrar o app.
+    }
+  }
+
+  function updateNotificationsButton() {
+    const btn = document.getElementById('btn-notifications');
+    if (!btn) return;
+    const on = !!uiPrefs.notificationsEnabled && notificationsSupported() && Notification.permission === 'granted';
+    btn.textContent = '🔔 Notificações: ' + (on ? 'Ligadas' : 'Desligadas');
+    btn.setAttribute('aria-pressed', String(on));
+  }
+
+  function setupNotificationsToggle() {
+    const btn = document.getElementById('btn-notifications');
+    if (!btn) return;
+    if (!notificationsSupported()) {
+      btn.disabled = true;
+      btn.title = 'Seu navegador não suporta notificações.';
+      return;
+    }
+    updateNotificationsButton();
+    btn.addEventListener('click', function () {
+      if (!uiPrefs.notificationsEnabled) {
+        requestNotificationPermission().then(function (perm) {
+          uiPrefs.notificationsEnabled = perm === 'granted';
+          saveUiPrefs();
+          updateNotificationsButton();
+          if (perm === 'granted') {
+            showToast('Notificações ativadas — aviso quando o Pomodoro acabar ou a streak estiver em risco.', 'success');
+          } else if (perm === 'denied') {
+            showToast('Notificações bloqueadas pelo navegador — precisa liberar nas configurações do site.', 'warning');
+          }
+        });
+      } else {
+        uiPrefs.notificationsEnabled = false;
+        saveUiPrefs();
+        updateNotificationsButton();
       }
     });
   }
 
-  // Encerra a Sessão de propósito: registra o tempo decorrido no histórico
-  // (conta pro streak e pro heatmap) e zera, pronta pra uma próxima sessão.
-  // Diferente de "Reiniciar", que só descarta sem guardar nada.
-  function endSession() {
-    const t = timers.session;
-    const minutes = Math.round(t.remaining / 60);
-
-    if (minutes >= 1) {
-      logHistory('session', 'Sessão de estudo concluída', minutes + ' min');
-      registerActivityToday();
-      showToast('✅ Sessão de ' + minutes + ' min registrada no histórico.', 'success');
-    } else {
-      showToast('Sessão encerrada — menos de 1 minuto, não foi registrada.', 'info');
-    }
-
-    t.remaining = 0;
-    t.running = false;
-    t.started = false;
-    document.getElementById('session-value').textContent = formatTime(0);
-    updateTimerButton('session');
-
-    if (minutes >= 1) afterStateChange(); // atualiza histórico/heatmap/streak na hora
+  // Avisa no máximo 1x por dia, só depois das 20h, só se ainda não estudou
+  // hoje — pra não virar spam de notificação.
+  let streakNotifiedOn = null;
+  function maybeNotifyStreakRisk() {
+    if (!uiPrefs.notificationsEnabled) return;
+    const today = new Date().toDateString();
+    if (state.streak.lastDate === today) return;
+    if (streakNotifiedOn === today) return;
+    if (new Date().getHours() < 20) return;
+    streakNotifiedOn = today;
+    const body = state.streak.current > 0
+      ? ('Sua streak de ' + state.streak.current + ' dias ainda pode continuar hoje.')
+      : 'Ainda dá tempo de estudar um pouco hoje.';
+    fireNotification('Compendium — não perca o dia', body);
   }
 
   function setupTimers() {
     setInterval(tickTimers, 1000);
+    // Se a aba volta a ficar visível, recalcula na hora — não espera o
+    // próximo disparo do setInterval (que pode ter ficado throttled).
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) tickTimers();
+    });
     // Rótulo correto ("Iniciar") já na primeira renderização, antes de qualquer clique
     updateTimerButton('pomodoro');
     updateTimerButton('session');
@@ -1210,18 +1940,34 @@
         const key = btn.dataset.timer;
         const t = timers[key];
         if (btn.dataset.action === 'pause') {
-          t.running = !t.running;
-          if (t.running) t.started = true;
+          if (t.runningSince) {
+            pauseTimer(t);
+          } else {
+            startOrResumeTimer(t);
+          }
+          redrawTimer(key);
           updateTimerButton(key);
-        } else if (btn.dataset.action === 'end' && key === 'session') {
-          endSession();
+        } else if (btn.dataset.action === 'stop') {
+          // "Encerrar" — só existe no timer de Sessão. Soma o tempo decorrido
+          // ao total permanente, loga no Histórico e conta pro streak/heatmap.
+          // Diferente de "Reiniciar": aqui o tempo FICA registrado.
+          const elapsed = elapsedSeconds(t); // sessão é count-up, elapsed = decorrido
+          if (elapsed > 0) {
+            state.totalStudySeconds = (state.totalStudySeconds || 0) + elapsed;
+            logHistory('session', 'Sessão de estudo', formatDuration(elapsed));
+            registerActivityToday();
+            showToast('⏱️ Sessão de ' + formatDuration(elapsed) + ' somada ao seu total.', 'success');
+          }
+          resetTimerState(t);
+          redrawTimer(key);
+          updateTimerButton(key);
+          if (elapsed > 0) afterStateChange();
         } else if (btn.dataset.action === 'reset') {
-          // "Reiniciar" descarta sem registrar nada — quem registra de
-          // verdade a sessão no histórico é o botão "Encerrar" (endSession).
-          t.remaining = key === 'pomodoro' ? POMODORO_SECONDS : 0;
-          t.running = false;
-          t.started = false;
-          document.getElementById(key + '-value').textContent = formatTime(t.remaining);
+          // "Reiniciar" descarta sem contar — pra quando a sessão foi um
+          // engano (ex: esqueceu rodando). Não soma ao total, não vai pro
+          // Histórico. Pomodoro só tem essa opção mesmo (não acumula total).
+          resetTimerState(t);
+          redrawTimer(key);
           updateTimerButton(key);
         }
       });
@@ -1236,6 +1982,7 @@
   // 21. GESTÃO DE DADOS (Exportar / Importar / Backup / Reiniciar)
   // =====================================================================
   function setupDataControls() {
+    document.getElementById('btn-undo').addEventListener('click', undoLastAction);
     document.getElementById('btn-export').addEventListener('click', function () {
       downloadJson({ embedded: DATA, state: state }, 'codex-export-' + Date.now() + '.json');
       showToast('Progresso exportado.', 'success');
@@ -1283,14 +2030,28 @@
     });
   }
 
+  function countChecked(arr) {
+    return (arr || []).filter(Boolean).length;
+  }
+
   function mergeState(current, incoming) {
     const merged = JSON.parse(JSON.stringify(current));
     Object.keys(incoming.nodes || {}).forEach(function (id) {
       const inc = incoming.nodes[id];
       const cur = merged.nodes[id] || { xp: 0, kp: 0 };
-      merged.nodes[id] = { xp: Math.max(cur.xp, inc.xp || 0), kp: Math.max(cur.kp, inc.kp || 0) };
+      const mergedNode = { xp: Math.max(cur.xp, inc.xp || 0), kp: Math.max(cur.kp, inc.kp || 0) };
+      // Checklist de entrega e link de portfólio não existiam antes desta
+      // rodada — sem tratar aqui, um merge reconstruiria o nó só com xp/kp
+      // e apagaria os dois campos silenciosamente.
+      mergedNode.checkedDeliverables = countChecked(inc.checkedDeliverables) >= countChecked(cur.checkedDeliverables)
+        ? inc.checkedDeliverables : cur.checkedDeliverables;
+      mergedNode.portfolioUrl = inc.portfolioUrl || cur.portfolioUrl;
+      // lastKpTs — pega o mais recente dos dois lados (maior timestamp = mais recente)
+      mergedNode.lastKpTs = Math.max(inc.lastKpTs || 0, cur.lastKpTs || 0) || undefined;
+      merged.nodes[id] = mergedNode;
     });
     merged.bonusXp = Math.max(merged.bonusXp || 0, incoming.bonusXp || 0);
+    merged.totalStudySeconds = Math.max(merged.totalStudySeconds || 0, incoming.totalStudySeconds || 0);
     merged.streak.current = Math.max(merged.streak.current || 0, (incoming.streak || {}).current || 0);
     const existingMissionIds = new Set(merged.missions.map(function (m) { return m.id; }));
     (incoming.missions || []).forEach(function (m) { if (!existingMissionIds.has(m.id)) merged.missions.push(m); });
@@ -1347,6 +2108,12 @@
         closeDrawer();
         document.getElementById('mission-form-overlay').hidden = true;
         closeCelebration();
+        closeOnboarding();
+        closeTopbarMenu();
+        document.querySelectorAll('.info-tooltip.is-open').forEach(function (tip) {
+          tip.classList.remove('is-open');
+          tip.querySelector('.info-icon').setAttribute('aria-expanded', 'false');
+        });
         return;
       }
       if (typing) return;
@@ -1364,7 +2131,31 @@
   }
 
   // =====================================================================
-  // 24. ORQUESTRAÇÃO
+  // 24. ONBOARDING (primeira visita)
+  // Guardado em uiPrefs (não em state) — Reiniciar não deve trazer isso de
+  // volta pra quem já conhece o app, só resetar progresso.
+  // =====================================================================
+  function closeOnboarding() {
+    const overlay = document.getElementById('onboarding-overlay');
+    if (overlay) overlay.hidden = true;
+    if (!uiPrefs.onboardingSeen) {
+      uiPrefs.onboardingSeen = true;
+      saveUiPrefs();
+    }
+  }
+
+  function setupOnboarding() {
+    const overlay = document.getElementById('onboarding-overlay');
+    if (!overlay) return;
+    document.getElementById('btn-close-onboarding').addEventListener('click', closeOnboarding);
+    overlay.addEventListener('click', function (e) {
+      if (e.target.id === 'onboarding-overlay') closeOnboarding();
+    });
+    if (!uiPrefs.onboardingSeen) overlay.hidden = false;
+  }
+
+  // =====================================================================
+  // 25. ORQUESTRAÇÃO
   // =====================================================================
   function afterStateChange() {
     checkAchievements();
@@ -1373,6 +2164,9 @@
     renderTree();
     renderCategoryTabs();
     renderCharacterSheet();
+    renderTotalHours();
+    renderAttributes();
+    renderStreakIndicator();
     renderWeeklyGoal();
     renderMissions();
     renderAchievements();
@@ -1380,12 +2174,79 @@
     renderHistory();
   }
 
+  // Extrai o número assinado do início de um detail tipo "+40 XP" / "-10 KP"
+  // — mesmo formato que logHistory() já grava, então é seguro reaproveitar.
+  function extractSignedNumber(detail) {
+    const m = /^([+-]\d+)/.exec(detail || '');
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  // Resumo ao reabrir — 1x por dia (controlado via uiPrefs, não via state,
+  // porque é uma questão de "já vi isso hoje neste aparelho", não progresso).
+  function maybeShowWelcomeBackSummary() {
+    const today = new Date().toDateString();
+    if (uiPrefs.lastWelcomeShown === today) return;
+    uiPrefs.lastWelcomeShown = today;
+    saveUiPrefs();
+
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    let xpYesterday = 0;
+    state.history.forEach(function (h) {
+      if (h.type === 'xp' && new Date(h.ts).toDateString() === yesterday) {
+        xpYesterday += extractSignedNumber(h.detail);
+      }
+    });
+    const streak = state.streak.current;
+    const streakPart = streak > 0 ? ('streak em ' + streak + ' dia' + (streak === 1 ? '' : 's') + '.') : '';
+
+    let msg;
+    if (xpYesterday > 0 && streakPart) {
+      msg = '🌅 Bem-vindo de volta! Ontem: +' + xpYesterday + ' XP — ' + streakPart;
+    } else if (xpYesterday > 0) {
+      msg = '🌅 Bem-vindo de volta! Ontem: +' + xpYesterday + ' XP.';
+    } else if (streakPart) {
+      msg = '🌅 Bem-vindo de volta! Sua ' + streakPart;
+    } else {
+      msg = '🌅 Bem-vindo de volta! Bom te ver por aqui.';
+    }
+    showToast(msg, 'suggestion');
+  }
+
+  function setupManualHoursEntry() {
+    const btn = document.getElementById('btn-add-manual-hours');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      const input = window.prompt('Quantos minutos você quer adicionar ao total de horas de estudo? (ex: 45)');
+      if (input === null) return; // cancelou
+      const minutes = parseInt(input, 10);
+      if (!minutes || minutes <= 0) {
+        showToast('Valor inválido — digite um número de minutos maior que 0.', 'warning');
+        return;
+      }
+      const seconds = minutes * 60;
+      state.totalStudySeconds = (state.totalStudySeconds || 0) + seconds;
+      logHistory('session', 'Registro manual', formatDuration(seconds));
+      registerActivityToday();
+      showToast('⏱️ ' + formatDuration(seconds) + ' adicionados ao seu total.', 'success');
+      afterStateChange();
+    });
+  }
+
   function init() {
     state = loadState();
+    notes = loadNotes();
+    if (checkRecurringMissions()) saveState();
+    // Checa conquistas já no load — sem isso, quem já qualifica pra uma
+    // conquista recém-adicionada (ex: as de Domínio Profundo desta rodada)
+    // só receberia crédito na próxima ação, não retroativamente.
+    checkAchievements();
+    saveState();
 
     renderCategoryTabs();
-    focusCategory(currentCategoryId);
-    renderCharacterSheet();
+    focusCategory(currentCategoryId); // já chama renderCharacterSheet() internamente
+    renderTotalHours();
+    renderAttributes();
+    renderStreakIndicator();
     renderWeeklyGoal();
     renderMissions();
     renderAchievements();
@@ -1404,8 +2265,31 @@
     setupWeeklyGoal();
     setupRecommendation();
     setupCelebration();
+    setupSidebarToggles();
+    setupThemeToggle();
+    setupTopbarMenu();
+    setupInstallPrompt();
+    maybeShowWelcomeBackSummary();
+    positionRecommendButton();
+    setupNotificationsToggle();
+    document.getElementById('btn-specializations').addEventListener('click', revealSpecializations);
+    setupInfoTooltips();
+    setupOnboarding();
+    setupManualHoursEntry();
 
-    window.addEventListener('resize', applyTransform);
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('service-worker.js').catch(function () {
+          // PWA é opcional — se o navegador bloquear (ex: aberto via file://
+          // sem servidor), o app segue funcionando normalmente sem ela.
+        });
+      });
+    }
+
+    window.addEventListener('resize', function () {
+      applyTransform();
+      positionRecommendButton();
+    });
 
     checkAchievements();
     checkCelebrations();

@@ -54,6 +54,20 @@ hr {
   justify-content: space-between;
   gap: 24px;
   padding: 0 24px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin; /* Firefox — cor vem do theme.css via scrollbar-color */
+}
+/* Scrollbar fina e discreta em vez do padrão cinza/branco do sistema —
+   cor real fica no theme.css (varia por tema), aqui só o tamanho. */
+.topbar::-webkit-scrollbar {
+  height: 5px;
+}
+.topbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.topbar::-webkit-scrollbar-thumb {
+  border-radius: 3px;
 }
 
 .topbar-brand {
@@ -76,6 +90,24 @@ hr {
 .app-subtitle {
   margin: 2px 0 0;
   font-size: var(--fs-micro);
+}
+
+.streak-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+.streak-flame {
+  font-size: 16px;
+  line-height: 1;
+  transition: filter 200ms ease-out;
+}
+.streak-count {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
 }
 
 .topbar-timers {
@@ -114,10 +146,52 @@ hr {
   display: none;
 }
 
+.timer-block-total {
+  padding-left: 16px;
+  border-left: 1px solid;
+}
+/* No modo compacto o total continua visível — é só leitura, não some junto
+   com os botões de controle dos timers. */
+
 .topbar-actions {
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.topbar-menu {
+  position: relative;
+}
+
+/* position:fixed de propósito — a topbar agora tem overflow-y:hidden (ver
+   correção de estouro horizontal), então position:absolute cortaria o menu
+   pela metade. JS calcula top/right a partir do botão em tempo real. */
+.topbar-menu-dropdown {
+  position: fixed;
+  width: 230px;
+  padding: 8px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 250;
+}
+.topbar-menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: var(--fs-small);
+}
+.topbar-menu-divider {
+  margin: 4px 2px;
+  border: none;
+  border-top: 1px solid;
+}
+/* Mesmo motivo do .drawer-overlay[hidden] logo abaixo — display:flex vence
+   o display:none nativo do atributo [hidden] se não for dito explicitamente. */
+.topbar-menu-dropdown[hidden] {
+  display: none;
 }
 
 .btn-topbar {
@@ -133,13 +207,43 @@ hr {
 .app-layout {
   display: grid;
   grid-template-columns: 280px 1fr 340px;
+  grid-template-rows: minmax(0, 1fr); /* trava a altura da linha na real
+    disponível (calc abaixo) — sem isso, a linha implícita crescia pra
+    caber o conteúdo mais alto (a ficha do personagem), estourando pra
+    fora da viewport sem nenhum scroll possível pra alcançar o resto. */
   height: calc(100vh - 72px);
+  transition: grid-template-columns 220ms ease-out;
+}
+
+/* Painéis retráteis (QoL: recupera espaço da árvore em telas divididas) —
+   a coluna vira uma faixa fina de 44px, larga o bastante pro botão de
+   retomar continuar clicável (alvo mínimo de toque). */
+.app-layout.left-collapsed {
+  grid-template-columns: 44px 1fr 340px;
+}
+.app-layout.right-collapsed {
+  grid-template-columns: 280px 1fr 44px;
+}
+.app-layout.left-collapsed.right-collapsed {
+  grid-template-columns: 44px 1fr 44px;
+}
+.app-layout.left-collapsed .character-sheet .sidebar-inner,
+.app-layout.right-collapsed .side-panel .sidebar-inner {
+  display: none;
 }
 
 /* ===================================================================
  * FICHA DO PERSONAGEM (coluna esquerda)
  * =================================================================== */
 .character-sheet {
+  position: relative;
+  min-height: 0; /* sem isso, o item de grid recusa encolher abaixo do
+                     conteúdo — ver comentário em .app-layout */
+}
+
+.character-sheet .sidebar-inner {
+  width: 100%;
+  height: 100%;
   padding: 28px 20px;
   overflow-y: auto;
   display: flex;
@@ -189,6 +293,10 @@ hr {
   width: 100%;
   text-align: left;
   margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid;
+  position: relative; /* ancora .info-tooltip-content — ver comentário lá */
 }
 
 .stat-row {
@@ -204,6 +312,85 @@ hr {
   letter-spacing: 0.08em;
   margin: 0 0 6px;
   text-align: left;
+}
+
+.stat-caption-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.stat-caption-row .stat-caption { margin-bottom: 0; }
+
+.attributes-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+.attribute-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 2px;
+  border-radius: 6px;
+}
+.attribute-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.attribute-value {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+}
+
+/* Tooltip [i] — hover no mouse, toque/clique funciona igual (:focus-within
+   cobre teclado, .is-open cobre toque explícito em touch). */
+.info-tooltip {
+  display: inline-flex;
+}
+.info-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-style: italic;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+/* Ancorado no .stat-block (pai maior, position:relative), não no ícone —
+   um tooltip de largura fixa ancorado num ícone de 16px estourava a
+   lateral em painéis estreitos. Ocupando a largura do bloco inteiro,
+   nunca passa da borda, não importa a largura do painel. */
+.info-tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  width: auto;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: var(--fs-micro);
+  line-height: 1.5;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 150ms ease-out, transform 150ms ease-out;
+  pointer-events: none;
+  z-index: 20;
+}
+.info-tooltip:hover .info-tooltip-content,
+.info-tooltip:focus-within .info-tooltip-content,
+.info-tooltip.is-open .info-tooltip-content {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .progress-track {
@@ -306,6 +493,7 @@ hr {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 
 .tree-toolbar {
@@ -396,6 +584,8 @@ hr {
   overflow: hidden;
   cursor: grab;
   touch-action: none;
+  user-select: none; /* arrastar pra fazer pan não pode selecionar texto dos
+                         rótulos por baixo — isso interrompia o arrasto */
 }
 
 .tree-canvas.is-panning {
@@ -476,14 +666,41 @@ hr {
  * PAINEL LATERAL DIREITO (Missões / Conquistas / Estatísticas / Histórico)
  * =================================================================== */
 .side-panel {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.side-panel .sidebar-inner {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
+/* Botão de retrair — fica preso no canto, visível nos dois estados
+   (expandido e recolhido), sempre dentro dos 44px da faixa fina. */
+.sidebar-toggle {
+  position: absolute;
+  top: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: var(--fs-small);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+.sidebar-toggle-left { right: 8px; }
+.sidebar-toggle-right { left: 8px; }
+
 .side-panel-tabs {
   display: flex;
   flex-shrink: 0;
+  padding-left: 38px; /* espaço reservado pro botão de retrair (.sidebar-toggle-right) */
 }
 
 .tab-btn {
@@ -753,6 +970,104 @@ hr {
   margin-bottom: 24px;
 }
 
+.onboarding-list {
+  margin: 0 0 26px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.onboarding-list li {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  padding-left: 18px;
+  position: relative;
+}
+.onboarding-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.drawer-resources, .drawer-deliverables, .drawer-portfolio, .drawer-notes {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.resources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.resources-list a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: var(--fs-small);
+  text-decoration: none;
+}
+
+.deliverables-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.deliverable-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: var(--fs-small);
+  line-height: 1.4;
+  cursor: pointer;
+}
+.deliverable-item input[type="checkbox"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+.deliverable-item.is-checked span { text-decoration: line-through; }
+
+.portfolio-input, .notes-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: var(--fs-small);
+  font-family: inherit;
+}
+.notes-textarea {
+  min-height: 90px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.notes-char-count {
+  font-size: 11px;
+}
+
+.review-queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.review-queue-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: var(--fs-small);
+  text-align: left;
+  cursor: pointer;
+}
+
 .drawer-stat-header {
   display: flex;
   justify-content: space-between;
@@ -874,6 +1189,9 @@ fieldset.form-field legend {
 }
 
 .btn-remove-row {
+  position: static; /* .btn-close (classe compartilhada) é absolute — sem
+    isto, esse X "pula" pro canto do formulário e cobre o X de fechar de
+    verdade, exigindo dois cliques pra fechar (era esse o bug reportado) */
   width: 28px;
   height: 28px;
   border-radius: 50%;

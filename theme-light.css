@@ -1,27 +1,29 @@
 /**
- * theme.css
+ * theme-light.css
  * Compendium: Codex do Engenheiro de Dados
- * Tema: Manuscrito Arcano (Grimório Escuro)
+ * Tema: Blueprint de Engenharia (Prancheta Técnica)
  *
- * REGRA DE ARQUITETURA (ver PROMPT_BASE.md seção 1):
- * Este arquivo cuida SÓ de estética — cores, fontes, texturas, glow.
- * Nenhum grid, posicionamento, tamanho estrutural ou responsividade aqui.
- * Isso vive em style.css. Trocar de tema = trocar só este arquivo.
+ * Segunda paleta, alternativa ao Manuscrito Arcano (theme.css) — mesmo
+ * princípio de arquitetura: SÓ estética aqui, nenhuma estrutura. As duas
+ * folhas de estilo definem exatamente as mesmas variáveis e seletores;
+ * trocar de tema é só trocar qual das duas está habilitada.
  *
- * Fontes usadas (adicionar no <head> do index.html):
- * <link rel="preconnect" href="https://fonts.googleapis.com">
- * <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
- * <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Crimson+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+ * Fundo azul profundo (papel de blueprint/cianotipo), grade e linhas em
+ * branco giz, tipografia monoespaçada (ecoando desenho técnico rotulado à
+ * mão) em vez da serifada ornamentada do tema escuro.
+ *
+ * Usa as mesmas fontes já carregadas pelo tema escuro (nenhum import novo
+ * de fonte, zero dependência de rede a mais).
  */
 
 :root {
 
   /* ---------------------------------------------------------------
-   * TIPOGRAFIA
-   * Display = títulos/categorias · Body = texto corrido · Mono = XP/KP/código
+   * TIPOGRAFIA — monoespaçada em tudo, reforça a leitura de "desenho
+   * técnico rotulado" em vez do "manuscrito" do tema escuro
    * ------------------------------------------------------------- */
-  --font-display: "Cinzel", "Georgia", serif;
-  --font-body: "Crimson Pro", "Iowan Old Style", serif;
+  --font-display: "JetBrains Mono", "SFMono-Regular", monospace;
+  --font-body: "JetBrains Mono", "SFMono-Regular", monospace;
   --font-mono: "JetBrains Mono", "SFMono-Regular", monospace;
 
   --fs-hero: 2.2rem;
@@ -35,68 +37,64 @@
   --fw-medium: 500;
   --fw-bold: 700;
 
-  --ls-display: 0.04em; /* leve espaçamento entre letras nos títulos, efeito "gravado" */
+  --ls-display: 0.02em; /* monoespaçado já tem presença técnica própria, sem precisar de tanto tracking */
 
   /* ---------------------------------------------------------------
-   * SUPERFÍCIES (fundo em camadas — nunca preto puro)
+   * SUPERFÍCIES — azul blueprint em camadas (nunca preto, nunca branco puro)
    * ------------------------------------------------------------- */
-  --surface-0: #14151a;   /* fundo geral da aplicação — era marrom quente */
-  --surface-1: #1a1c22;   /* topbar, painéis laterais */
-  --surface-2: #202329;   /* cards, drawer, missões */
-  --surface-3: #282b33;   /* hover / elementos elevados */
-  --surface-border: #33363f;
+  --surface-0: #0e2c48;   /* fundo geral — azul cianotipo profundo */
+  --surface-1: #123655;   /* topbar, painéis laterais */
+  --surface-2: #163f62;   /* cards, drawer, missões */
+  --surface-3: #1c4a70;   /* hover / elementos elevados */
+  --surface-border: #3d6f95;
 
-  /* Textura de pergaminho: grão sutil via ruído SVG + leve vinheta radial */
-  --texture-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  /* Vinheta agora usa o próprio dourado do acento, em vez de marrom — reforça
-     "só o dourado é quente" em vez de competir com o fundo esfriado. */
-  --texture-vignette: radial-gradient(ellipse at 50% 20%, rgba(212, 169, 74, 0.09), transparent 65%);
+  /* Grade de blueprint (linhas finas brancas) no lugar do grão de pergaminho */
+  --texture-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M40 0H0V40' fill='none' stroke='%23ffffff' stroke-width='0.6' opacity='0.07'/%3E%3C/svg%3E");
+  --texture-vignette: radial-gradient(ellipse at 50% 20%, rgba(255, 255, 255, 0.05), transparent 65%);
 
-  /* Marca d'água do hexágono — elemento de assinatura visual, usado no
-     espaço vazio do canvas da árvore. */
-  --texture-hex-watermark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='110'%3E%3Cpolygon points='48,4 90,29 90,81 48,106 6,81 6,29' fill='none' stroke='%23d4a94a' stroke-width='1' stroke-opacity='0.05'/%3E%3C/svg%3E");
+  /* Marca d'água do hexágono — mesmo motivo do tema escuro, recolorido pra
+     branco giz translúcido em vez de dourado */
+  --texture-hex-watermark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='110'%3E%3Cpolygon points='48,4 90,29 90,81 48,106 6,81 6,29' fill='none' stroke='%23ffffff' stroke-width='1' stroke-opacity='0.07'/%3E%3C/svg%3E");
 
-  /* Rachaduras finas — usadas nos nós "locked", reforçando o efeito de
-     pergaminho antigo selado */
-  --texture-cracks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M22 12 L34 38 L24 52 L38 78' stroke='%23000000' stroke-width='2' fill='none' opacity='0.55' stroke-linecap='round'/%3E%3Cpath d='M72 8 L60 33 L76 48 L64 74' stroke='%23000000' stroke-width='1.6' fill='none' opacity='0.45' stroke-linecap='round'/%3E%3Cpath d='M46 48 L57 64 L49 86' stroke='%23000000' stroke-width='1.3' fill='none' opacity='0.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  /* "Rachaduras" viram hachura técnica branca — mesma forma, leitura nova:
+     nó bloqueado = área ainda não desenhada na prancheta */
+  --texture-cracks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M22 12 L34 38 L24 52 L38 78' stroke='%23ffffff' stroke-width='2' fill='none' opacity='0.35' stroke-linecap='round'/%3E%3Cpath d='M72 8 L60 33 L76 48 L64 74' stroke='%23ffffff' stroke-width='1.6' fill='none' opacity='0.3' stroke-linecap='round'/%3E%3Cpath d='M46 48 L57 64 L49 86' stroke='%23ffffff' stroke-width='1.3' fill='none' opacity='0.25' stroke-linecap='round'/%3E%3C/svg%3E");
 
   /* ---------------------------------------------------------------
    * TEXTO
    * ------------------------------------------------------------- */
-  --text-primary: #ece7dc;
-  --text-secondary: #aeb0b8; /* era tom quente (tan) — neutro agora, só o dourado carrega calor */
-  --text-muted: #8b8d94;
-  --text-on-accent: #14100b; /* texto escuro sobre fundo dourado/claro, garante contraste AA */
+  --text-primary: #f1f6fb;    /* branco giz */
+  --text-secondary: #b9d0e3;
+  --text-muted: #82a4c0;
+  --text-on-accent: #0d2138;  /* texto escuro sobre acento claro/dourado, garante contraste AA */
 
-  /* Dourado de destaque — único acento quente da tela (era usado só como
-     hex cru dentro do SVG do watermark; agora é um token de verdade,
-     reutilizável em qualquer elemento que precise desse mesmo dourado). */
-  --accent-gold: #d4a94a;
+  --accent-gold: #f0b94a;
 
   /* ---------------------------------------------------------------
    * ACCENTS SEMÂNTICOS — Estados dos nós (ver PROMPT_BASE.md seção 3)
+   * Mesma família de cor por estado que o tema escuro (locked=âmbar,
+   * active=vermelho, mastered=verde, boss=dourado) — só a luminância muda,
+   * pra não obrigar reaprender o significado ao trocar de tema.
    * ------------------------------------------------------------- */
-  --state-locked-fg: #b3a06a;              /* clareado — perdia contraste contra o fundo já esfriado */
-  --state-locked-bg: rgba(72, 61, 32, 0.6);
-  --state-locked-border: #8f7a4a;
-  --state-locked-accent: #c9b16e;
+  --state-locked-fg: #a9c3d9;
+  --state-locked-bg: rgba(255, 255, 255, 0.08);
+  --state-locked-border: #4d7ca3;
+  --state-locked-accent: #6f9ac2;
 
-  --state-active-accent: #b8433f;          /* vermelho — "ainda sem XP, mas disponível" */
-  --state-active-glow: rgba(184, 67, 63, 0.55);
+  --state-active-accent: #e2564f;
+  --state-active-glow: rgba(226, 86, 79, 0.55);
 
-  --state-mastered-accent: #5fae6e;        /* verde — "concluído" */
-  --state-mastered-glow: rgba(95, 174, 110, 0.55);
-  --state-mastered-bg: #5fae6e;
+  --state-mastered-accent: #49c17a;
+  --state-mastered-glow: rgba(73, 193, 122, 0.55);
+  --state-mastered-bg: #49c17a;
 
-  /* Marco Principal (is-boss) não tem mais cor de preenchimento própria —
-     usa um anel dourado por cima da cor real do estado (ver seção "ESTADOS
-     VISUAIS" abaixo), então continua vermelho se ainda não concluído e
-     verde quando concluído, só com o anel de destaque a mais. */
-  --state-boss-trim: #d9b45c;
-  --state-boss-trim-glow: rgba(217, 180, 92, 0.5);
+  --state-boss-trim: #f0c94e;
+  --state-boss-trim-glow: rgba(240, 201, 78, 0.5);
 
   /* ---------------------------------------------------------------
    * CORES DE CATEGORIA (espelham data-embedded.js — não duplicar valores lá)
+   * Iguais nos dois temas: script.js aplica via inline style a partir dos
+   * dados, então trocar aqui sozinho não mudaria nada nas abas/árvore mesmo
    * ------------------------------------------------------------- */
   --cat-fundamentos: #c9a24b;
   --cat-programacao: #4bb3c9;
@@ -110,24 +108,24 @@
   /* ---------------------------------------------------------------
    * UI FUNCIONAL (botões de XP/KP, feedback)
    * ------------------------------------------------------------- */
-  --action-positive: #5cb87a;   /* botões +XP / +KP */
-  --action-positive-hover: #6fd090;
-  --action-negative: #b8544f;   /* botões -XP / -KP */
-  --action-negative-hover: #cf6a64;
+  --action-positive: #3fae70;
+  --action-positive-hover: #52c684;
+  --action-negative: #d1524c;
+  --action-negative-hover: #e06862;
   --action-neutral: var(--surface-3);
 
-  --focus-ring: #e8c874; /* outline de foco — visível sobre fundo escuro, AA-compliant */
+  --focus-ring: #ffd670;
 
   /* ---------------------------------------------------------------
    * LINHAS DE CONEXÃO SVG (formato Circuito — ângulos retos, sem curvas)
    * ------------------------------------------------------------- */
-  --line-inactive: #34291a;
+  --line-inactive: #2a5680;
   --line-active: var(--state-mastered-accent);
   --line-width: 2px;
   --line-width-active: 2.5px;
 
   /* ---------------------------------------------------------------
-   * MOVIMENTO
+   * MOVIMENTO — iguais ao tema escuro
    * ------------------------------------------------------------- */
   --pulse-duration: 2.4s;
   --transition-fast: 140ms ease-out;
@@ -197,7 +195,7 @@ h1, h2, h3, .font-display {
   transition: box-shadow var(--transition-base), background-color var(--transition-base), border-color var(--transition-base);
 }
 
-/* 🔒 Bloqueada — pergaminho antigo desbotado */
+/* 🔒 Bloqueada — área ainda não desenhada na prancheta */
 .skill-node.locked {
   background-color: var(--state-locked-bg);
   border-color: var(--state-locked-border);
@@ -206,7 +204,7 @@ h1, h2, h3, .font-display {
 .skill-node.locked .node-icon::before {
   content: "🔒";
 }
-/* Rachaduras sutis — reforça a leitura de "pergaminho antigo selado" */
+/* Hachura sutil — reforça a leitura de "ainda não desenhado" */
 .skill-node.locked::after {
   content: "";
   position: absolute;
@@ -441,7 +439,7 @@ h1, h2, h3, .font-display {
 .streak-flame { filter: grayscale(1); }
 .streak-indicator.is-active { color: var(--state-mastered-accent); }
 .streak-indicator.is-active .streak-flame { filter: grayscale(0); }
-.streak-indicator.is-at-risk { background-color: rgba(217, 75, 106, 0.15); color: var(--action-negative); }
+.streak-indicator.is-at-risk { background-color: rgba(226, 86, 79, 0.2); color: var(--action-negative); }
 
 .onboarding-list li::before { background-color: var(--state-boss-trim); }
 .onboarding-list strong { color: var(--text-primary); }
@@ -532,7 +530,7 @@ h1, h2, h3, .font-display {
   border: 1px solid var(--surface-border);
 }
 .node-chip-flat {
-  background-color: rgba(217, 180, 92, 0.15);
+  background-color: rgba(240, 201, 78, 0.18);
   color: var(--state-mastered-accent);
   border-color: var(--state-mastered-accent);
 }
@@ -558,8 +556,8 @@ h1, h2, h3, .font-display {
   border: 1px solid var(--surface-border);
 }
 .achievement-card.is-unlocked { border-color: var(--state-mastered-accent); box-shadow: 0 0 12px var(--state-mastered-glow); }
-.achievement-card.tier-bronze .achievement-tier { color: #c98a4b; }
-.achievement-card.tier-prata  .achievement-tier { color: #b8bfc9; }
+.achievement-card.tier-bronze .achievement-tier { color: #e0a468; }
+.achievement-card.tier-prata  .achievement-tier { color: #d8e0e8; }
 .achievement-card.tier-ouro   .achievement-tier { color: var(--state-mastered-accent); }
 .achievement-card.is-locked { opacity: 0.55; }
 
@@ -567,9 +565,9 @@ h1, h2, h3, .font-display {
 .history-time { color: var(--text-muted); }
 
 .heatmap-cell.heat-0 { background-color: var(--surface-2); }
-.heatmap-cell.heat-1 { background-color: rgba(95, 174, 110, 0.25); }
-.heatmap-cell.heat-2 { background-color: rgba(95, 174, 110, 0.5); }
-.heatmap-cell.heat-3 { background-color: rgba(95, 174, 110, 0.75); }
+.heatmap-cell.heat-1 { background-color: rgba(73, 193, 122, 0.25); }
+.heatmap-cell.heat-2 { background-color: rgba(73, 193, 122, 0.5); }
+.heatmap-cell.heat-3 { background-color: rgba(73, 193, 122, 0.75); }
 .heatmap-cell.heat-4 { background-color: var(--state-mastered-accent); }
 .history-label { color: var(--text-primary); }
 .history-detail { color: var(--text-secondary); }
@@ -579,9 +577,9 @@ h1, h2, h3, .font-display {
  * =================================================================== */
 .celebration-modal {
   background-color: var(--surface-2);
-  background-image: radial-gradient(ellipse at 50% -10%, rgba(217, 180, 92, 0.25), transparent 60%);
+  background-image: radial-gradient(ellipse at 50% -10%, rgba(240, 201, 78, 0.25), transparent 60%);
   border: 1px solid var(--state-mastered-accent);
-  box-shadow: 0 0 40px rgba(95, 174, 110, 0.35), 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 40px rgba(73, 193, 122, 0.35), 0 20px 60px rgba(0, 0, 0, 0.5);
 }
 .celebration-subtitle { color: var(--text-secondary); }
 

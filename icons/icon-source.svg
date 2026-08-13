@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0f0c09"/>
+  <rect width="512" height="512" rx="96" fill="url(#vignette)"/>
+  <polygon points="256,86 393,171 393,341 256,426 119,341 119,171"
+    fill="none" stroke="#d9b45c" stroke-width="14"/>
+  <polygon points="256,166 322,206 322,306 256,346 190,306 190,206"
+    fill="#d9b45c"/>
+  <defs>
+    <radialGradient id="vignette" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#3a2f16" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>
