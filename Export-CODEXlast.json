@@ -1,0 +1,2454 @@
+{
+  "embedded": {
+    "categories": [
+      {
+        "id": "fundamentos",
+        "name": "Fundamentos",
+        "order": 1,
+        "color": "#c9a24b"
+      },
+      {
+        "id": "programacao",
+        "name": "Programação",
+        "order": 2,
+        "color": "#4bb3c9"
+      },
+      {
+        "id": "banco-dados",
+        "name": "Banco de Dados",
+        "order": 3,
+        "color": "#4bc98a"
+      },
+      {
+        "id": "engenharia-dados",
+        "name": "Engenharia de Dados",
+        "order": 4,
+        "color": "#d98a3d"
+      },
+      {
+        "id": "cloud",
+        "name": "Cloud",
+        "order": 5,
+        "color": "#7a7ad9"
+      },
+      {
+        "id": "devops",
+        "name": "DevOps",
+        "order": 6,
+        "color": "#d94b6a"
+      },
+      {
+        "id": "visualizacao",
+        "name": "Visualização",
+        "order": 7,
+        "color": "#d9c94b"
+      },
+      {
+        "id": "soft-skills",
+        "name": "Soft Skills",
+        "order": 8,
+        "color": "#a94bd9"
+      }
+    ],
+    "skills": [
+      {
+        "id": "fund_logica",
+        "name": "Lógica",
+        "category": "fundamentos",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Estruturas condicionais, loops e pensamento algorítmico básico."
+      },
+      {
+        "id": "fund_dados",
+        "name": "Dados",
+        "category": "fundamentos",
+        "tier": 1,
+        "row": 0,
+        "prereq": "fund_logica",
+        "weight": 1,
+        "description": "O que são dados, tipos primitivos e representação."
+      },
+      {
+        "id": "fund_informacao",
+        "name": "Informação",
+        "category": "fundamentos",
+        "tier": 2,
+        "row": 0,
+        "prereq": "fund_dados",
+        "weight": 1,
+        "description": "Diferença entre dado, informação e conhecimento."
+      },
+      {
+        "id": "fund_algoritmos",
+        "name": "Algoritmos",
+        "category": "fundamentos",
+        "tier": 3,
+        "row": 0,
+        "prereq": "fund_informacao",
+        "weight": 1,
+        "description": "Complexidade (Big O), recursão, estruturas de dados básicas."
+      },
+      {
+        "id": "fund_estruturas",
+        "name": "Estruturas",
+        "category": "fundamentos",
+        "tier": 4,
+        "row": 0,
+        "prereq": "fund_algoritmos",
+        "weight": 1,
+        "description": "Listas, pilhas, filas, árvores e grafos."
+      },
+      {
+        "id": "fund_boss",
+        "name": "Desafio de Lógica",
+        "category": "fundamentos",
+        "tier": 5,
+        "row": 0,
+        "prereq": "fund_estruturas",
+        "weight": 1.5,
+        "description": "Projeto: resolver 20 desafios de lógica/algoritmos.",
+        "isBoss": true,
+        "deliverables": [
+          "Resolveu os 20 desafios sem consultar solução pronta",
+          "Cada solução tem comentário explicando a lógica usada",
+          "Pelo menos 5 desafios resolvidos com mais de uma abordagem",
+          "Consegue explicar a complexidade (Big O) de pelo menos 3 soluções"
+        ]
+      },
+      {
+        "id": "prog_python",
+        "name": "Python",
+        "category": "programacao",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Sintaxe, tipos, funções e fluxo básico em Python.",
+        "resources": [
+          {
+            "label": "📄 Docs oficiais do Python",
+            "url": "https://docs.python.org/3/"
+          }
+        ]
+      },
+      {
+        "id": "prog_logging",
+        "name": "Logging",
+        "category": "programacao",
+        "tier": 1,
+        "row": 0,
+        "prereq": "prog_python",
+        "weight": 1,
+        "description": "Registro de eventos e depuração estruturada."
+      },
+      {
+        "id": "prog_poo",
+        "name": "POO",
+        "category": "programacao",
+        "tier": 2,
+        "row": 0,
+        "prereq": "prog_logging",
+        "weight": 1,
+        "description": "Classes, objetos, herança e encapsulamento."
+      },
+      {
+        "id": "prog_boas_praticas",
+        "name": "Boas Práticas",
+        "category": "programacao",
+        "tier": 3,
+        "row": 0,
+        "prereq": "prog_poo",
+        "weight": 1,
+        "description": "Clean code, PEP8, type hints, testes."
+      },
+      {
+        "id": "prog_pip",
+        "name": "Pip",
+        "category": "programacao",
+        "tier": 1,
+        "row": 1,
+        "prereq": "prog_python",
+        "weight": 0.5,
+        "description": "Gerenciador de pacotes do Python."
+      },
+      {
+        "id": "prog_venv",
+        "name": "Virtual Env",
+        "category": "programacao",
+        "tier": 2,
+        "row": 1,
+        "prereq": "prog_pip",
+        "weight": 0.5,
+        "description": "Ambientes virtuais isolados (venv/poetry)."
+      },
+      {
+        "id": "prog_pandas",
+        "name": "Pandas",
+        "category": "programacao",
+        "tier": 1,
+        "row": 2,
+        "prereq": "prog_python",
+        "weight": 0.5,
+        "description": "Manipulação de dados tabulares."
+      },
+      {
+        "id": "prog_numpy",
+        "name": "NumPy",
+        "category": "programacao",
+        "tier": 2,
+        "row": 2,
+        "prereq": "prog_pandas",
+        "weight": 0.5,
+        "description": "Arrays numéricos e computação vetorizada."
+      },
+      {
+        "id": "prog_requests",
+        "name": "Requests",
+        "category": "programacao",
+        "tier": 1,
+        "row": 3,
+        "prereq": "prog_python",
+        "weight": 0.5,
+        "description": "Cliente HTTP para consumo de serviços web."
+      },
+      {
+        "id": "prog_apis",
+        "name": "APIs",
+        "category": "programacao",
+        "tier": 2,
+        "row": 3,
+        "prereq": "prog_requests",
+        "weight": 0.5,
+        "description": "Consumo e construção de APIs REST, autenticação básica."
+      },
+      {
+        "id": "prog_pytest",
+        "name": "Testes Unitários",
+        "category": "programacao",
+        "tier": 4,
+        "row": 4,
+        "prereq": "prog_boas_praticas",
+        "weight": 0.5,
+        "description": "Testes automatizados com PyTest — funções de teste, fixtures e asserts.",
+        "resources": [
+          {
+            "label": "📄 Docs oficiais do PyTest",
+            "url": "https://docs.pytest.org/en/stable/"
+          }
+        ]
+      },
+      {
+        "id": "prog_boss",
+        "name": "Script de ETL",
+        "category": "programacao",
+        "tier": 4,
+        "row": 0,
+        "prereq": "prog_boas_praticas",
+        "weight": 1.5,
+        "description": "Projeto: construir um script de ETL simples ponta a ponta em Python.",
+        "isBoss": true,
+        "deliverables": [
+          "Lê de uma fonte real (arquivo, API ou banco)",
+          "Trata erro de conexão/arquivo ausente sem quebrar o script inteiro",
+          "Tem log das etapas (início, transformação, carga, fim)",
+          "Roda de ponta a ponta com um único comando",
+          "Código com nomes claros, sem gambiarra comentada como TODO"
+        ]
+      },
+      {
+        "id": "db_sql",
+        "name": "SQL",
+        "category": "banco-dados",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Sintaxe base de SQL (SELECT, WHERE, ORDER BY).",
+        "resources": [
+          {
+            "label": "📄 Tutorial de SQL (PostgreSQL)",
+            "url": "https://www.postgresql.org/docs/current/tutorial.html"
+          }
+        ]
+      },
+      {
+        "id": "db_consultas",
+        "name": "Consultas",
+        "category": "banco-dados",
+        "tier": 1,
+        "row": 0,
+        "prereq": "db_sql",
+        "weight": 1,
+        "description": "JOINs, GROUP BY, subqueries, window functions."
+      },
+      {
+        "id": "db_chaves",
+        "name": "Chaves",
+        "category": "banco-dados",
+        "tier": 2,
+        "row": 0,
+        "prereq": "db_consultas",
+        "weight": 1,
+        "description": "Chaves primárias, estrangeiras, integridade referencial."
+      },
+      {
+        "id": "db_indices",
+        "name": "Índices",
+        "category": "banco-dados",
+        "tier": 3,
+        "row": 0,
+        "prereq": "db_chaves",
+        "weight": 1,
+        "description": "Índices e otimização de performance de queries."
+      },
+      {
+        "id": "db_modelagem",
+        "name": "Modelagem",
+        "category": "banco-dados",
+        "tier": 1,
+        "row": 1,
+        "prereq": "db_sql",
+        "weight": 0.5,
+        "description": "Modelagem entidade-relacionamento (ER)."
+      },
+      {
+        "id": "db_normalizacao",
+        "name": "Normalização",
+        "category": "banco-dados",
+        "tier": 2,
+        "row": 1,
+        "prereq": "db_modelagem",
+        "weight": 0.5,
+        "description": "1FN, 2FN, 3FN — eliminação de redundância."
+      },
+      {
+        "id": "db_postgresql",
+        "name": "PostgreSQL",
+        "category": "banco-dados",
+        "tier": 1,
+        "row": 2,
+        "prereq": "db_sql",
+        "weight": 0.5,
+        "description": "Recursos específicos e administração básica do Postgres.",
+        "resources": [
+          {
+            "label": "📄 Docs oficiais do PostgreSQL",
+            "url": "https://www.postgresql.org/docs/current/index.html"
+          }
+        ]
+      },
+      {
+        "id": "db_boss",
+        "name": "Modelagem Completa",
+        "category": "banco-dados",
+        "tier": 4,
+        "row": 0,
+        "prereq": "db_indices",
+        "weight": 1.5,
+        "description": "Projeto: modelar e implementar um banco relacional completo.",
+        "isBoss": true,
+        "deliverables": [
+          "Diagrama ER (mesmo que simples) documentando o modelo",
+          "Pelo menos uma tabela normalizada até 3FN",
+          "Chaves estrangeiras e índices nos campos de busca frequente",
+          "Um conjunto de queries de exemplo (join, agregação) rodando contra o banco"
+        ]
+      },
+      {
+        "id": "eng_etl",
+        "name": "ETL",
+        "category": "engenharia-dados",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Extract, Transform, Load — conceito e padrão clássico."
+      },
+      {
+        "id": "eng_elt",
+        "name": "ELT",
+        "category": "engenharia-dados",
+        "tier": 1,
+        "row": 0,
+        "prereq": "eng_etl",
+        "weight": 1,
+        "description": "Extract, Load, Transform — padrão moderno orientado a warehouse."
+      },
+      {
+        "id": "eng_dw",
+        "name": "Data Warehouse",
+        "category": "engenharia-dados",
+        "tier": 1,
+        "row": 1,
+        "prereq": "eng_etl",
+        "weight": 0.5,
+        "description": "Armazenamento analítico estruturado (BigQuery/Snowflake/Redshift)."
+      },
+      {
+        "id": "eng_datalake",
+        "name": "Data Lake",
+        "category": "engenharia-dados",
+        "tier": 2,
+        "row": 1,
+        "prereq": "eng_dw",
+        "weight": 0.5,
+        "description": "Armazenamento bruto e semi-estruturado (S3 + Parquet)."
+      },
+      {
+        "id": "eng_lakehouse",
+        "name": "Lakehouse",
+        "category": "engenharia-dados",
+        "tier": 3,
+        "row": 1,
+        "prereq": "eng_datalake",
+        "weight": 0.5,
+        "description": "Arquitetura híbrida Lake + Warehouse (Delta Lake)."
+      },
+      {
+        "id": "eng_moddim",
+        "name": "Modelagem Dimensional",
+        "category": "engenharia-dados",
+        "tier": 1,
+        "row": 2,
+        "prereq": "eng_etl",
+        "weight": 0.5,
+        "description": "Fatos e dimensões para modelagem analítica."
+      },
+      {
+        "id": "eng_starschema",
+        "name": "Star Schema",
+        "category": "engenharia-dados",
+        "tier": 2,
+        "row": 2,
+        "prereq": "eng_moddim",
+        "weight": 0.5,
+        "description": "Modelo estrela — simplicidade para BI."
+      },
+      {
+        "id": "eng_snowflake",
+        "name": "Snowflake Schema",
+        "category": "engenharia-dados",
+        "tier": 3,
+        "row": 2,
+        "prereq": "eng_starschema",
+        "weight": 0.5,
+        "description": "Normalização de dimensões do modelo estrela."
+      },
+      {
+        "id": "eng_orquestracao",
+        "name": "Orquestração",
+        "category": "engenharia-dados",
+        "tier": 1,
+        "row": 3,
+        "prereq": "eng_etl",
+        "weight": 0.5,
+        "description": "Agendamento e dependência de pipelines (Airflow).",
+        "resources": [
+          {
+            "label": "📄 Docs oficiais do Apache Airflow",
+            "url": "https://airflow.apache.org/docs/"
+          }
+        ]
+      },
+      {
+        "id": "eng_qualidade",
+        "name": "Qualidade de Dados",
+        "category": "engenharia-dados",
+        "tier": 2,
+        "row": 3,
+        "prereq": "eng_orquestracao",
+        "weight": 0.5,
+        "description": "Testes de dados, validação e monitoramento (Great Expectations)."
+      },
+      {
+        "id": "eng_boss",
+        "name": "Pipeline Completo",
+        "category": "engenharia-dados",
+        "tier": 4,
+        "row": 0,
+        "prereq": "eng_elt",
+        "weight": 1.5,
+        "description": "Projeto: pipeline completo ingestão → transformação → carga em DW.",
+        "isBoss": true,
+        "deliverables": [
+          "Ingestão de uma fonte real (API, arquivo ou banco de origem)",
+          "Transformação separada da carga (não tudo num script só)",
+          "Carrega num Data Warehouse ou estrutura equivalente",
+          "Idempotente — rodar de novo não duplica dados",
+          "Tratamento de erro que não derruba o pipeline inteiro numa falha pontual"
+        ]
+      },
+      {
+        "id": "cloud_aws",
+        "name": "AWS",
+        "category": "cloud",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Fundamentos da AWS: console, regiões, serviços core.",
+        "resources": [
+          {
+            "label": "📄 Docs oficiais da AWS",
+            "url": "https://docs.aws.amazon.com/"
+          }
+        ]
+      },
+      {
+        "id": "cloud_s3",
+        "name": "S3",
+        "category": "cloud",
+        "tier": 1,
+        "row": 0,
+        "prereq": "cloud_aws",
+        "weight": 1,
+        "description": "Armazenamento de objetos, buckets, políticas de acesso."
+      },
+      {
+        "id": "cloud_iam",
+        "name": "IAM",
+        "category": "cloud",
+        "tier": 2,
+        "row": 0,
+        "prereq": "cloud_s3",
+        "weight": 1,
+        "description": "Gerenciamento de identidade e acesso."
+      },
+      {
+        "id": "cloud_azure",
+        "name": "Azure",
+        "category": "cloud",
+        "tier": 1,
+        "row": 1,
+        "prereq": "cloud_aws",
+        "weight": 0.5,
+        "description": "Fundamentos do Microsoft Azure."
+      },
+      {
+        "id": "cloud_gcp",
+        "name": "GCP",
+        "category": "cloud",
+        "tier": 1,
+        "row": 2,
+        "prereq": "cloud_aws",
+        "weight": 0.5,
+        "description": "Fundamentos do Google Cloud Platform."
+      },
+      {
+        "id": "cloud_bigquery",
+        "name": "BigQuery",
+        "category": "cloud",
+        "tier": 2,
+        "row": 2,
+        "prereq": "cloud_gcp",
+        "weight": 0.5,
+        "description": "Data warehouse serverless do GCP."
+      },
+      {
+        "id": "cloud_supabase",
+        "name": "Supabase",
+        "category": "cloud",
+        "tier": 1,
+        "row": 3,
+        "prereq": "cloud_aws",
+        "weight": 0.5,
+        "description": "Backend-as-a-service moderno sobre Postgres."
+      },
+      {
+        "id": "cloud_boss",
+        "name": "Arquitetura Multi-Cloud",
+        "category": "cloud",
+        "tier": 3,
+        "row": 0,
+        "prereq": "cloud_iam",
+        "weight": 1.5,
+        "description": "Projeto: desenhar uma arquitetura resiliente multi-cloud.",
+        "isBoss": true,
+        "deliverables": [
+          "Diagrama da arquitetura com pelo menos 2 provedores",
+          "Justificativa escrita de por que cada serviço foi escolhido",
+          "Plano de failover ou redundância documentado",
+          "Estimativa de custo, mesmo que aproximada"
+        ]
+      },
+      {
+        "id": "devops_git",
+        "name": "Git",
+        "category": "devops",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Versionamento local: commits, branches, merge.",
+        "resources": [
+          {
+            "label": "📄 Docs oficiais do Git",
+            "url": "https://git-scm.com/doc"
+          }
+        ]
+      },
+      {
+        "id": "devops_github",
+        "name": "GitHub",
+        "category": "devops",
+        "tier": 1,
+        "row": 0,
+        "prereq": "devops_git",
+        "weight": 1,
+        "description": "Colaboração remota: PRs, issues, workflow em equipe."
+      },
+      {
+        "id": "devops_cicd",
+        "name": "CI/CD",
+        "category": "devops",
+        "tier": 2,
+        "row": 0,
+        "prereq": "devops_github",
+        "weight": 1,
+        "description": "Integração e entrega contínua — pipelines automatizados."
+      },
+      {
+        "id": "devops_linux",
+        "name": "Linux",
+        "category": "devops",
+        "tier": 1,
+        "row": 1,
+        "prereq": "devops_git",
+        "weight": 0.5,
+        "description": "Terminal, shell scripting, permissões e processos."
+      },
+      {
+        "id": "devops_docker",
+        "name": "Docker",
+        "category": "devops",
+        "tier": 1,
+        "row": 2,
+        "prereq": "devops_git",
+        "weight": 0.5,
+        "description": "Containers, imagens, Dockerfile e docker-compose.",
+        "resources": [
+          {
+            "label": "📄 Docs oficiais do Docker",
+            "url": "https://docs.docker.com/"
+          }
+        ]
+      },
+      {
+        "id": "devops_boss",
+        "name": "Pipeline CI/CD",
+        "category": "devops",
+        "tier": 3,
+        "row": 0,
+        "prereq": "devops_cicd",
+        "weight": 1.5,
+        "description": "Projeto: pipeline de CI/CD completo com testes automatizados.",
+        "isBoss": true,
+        "deliverables": [
+          "Roda testes automatizados a cada push",
+          "Build falha o pipeline se os testes não passarem",
+          "Deploy automatizado pelo menos até um ambiente de staging",
+          "Pipeline documentado (README explicando os estágios)"
+        ]
+      },
+      {
+        "id": "viz_dashboards",
+        "name": "Dashboards",
+        "category": "visualizacao",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Princípios de construção de dashboards eficazes."
+      },
+      {
+        "id": "viz_kpis",
+        "name": "KPIs",
+        "category": "visualizacao",
+        "tier": 1,
+        "row": 0,
+        "prereq": "viz_dashboards",
+        "weight": 1,
+        "description": "Definição e escolha de indicadores-chave."
+      },
+      {
+        "id": "viz_storytelling",
+        "name": "Storytelling",
+        "category": "visualizacao",
+        "tier": 2,
+        "row": 0,
+        "prereq": "viz_kpis",
+        "weight": 1,
+        "description": "Narrativa de dados para tomada de decisão."
+      },
+      {
+        "id": "viz_powerbi",
+        "name": "Power BI",
+        "category": "visualizacao",
+        "tier": 1,
+        "row": 1,
+        "prereq": "viz_dashboards",
+        "weight": 0.5,
+        "description": "Modelagem e visualização com Power BI."
+      },
+      {
+        "id": "viz_metabase",
+        "name": "Metabase",
+        "category": "visualizacao",
+        "tier": 1,
+        "row": 2,
+        "prereq": "viz_dashboards",
+        "weight": 0.5,
+        "description": "BI open-source self-service."
+      },
+      {
+        "id": "viz_boss",
+        "name": "Dashboard Executivo",
+        "category": "visualizacao",
+        "tier": 3,
+        "row": 0,
+        "prereq": "viz_storytelling",
+        "weight": 1.5,
+        "description": "Projeto: dashboard com pelo menos 3 KPIs que contam uma história.",
+        "isBoss": true,
+        "deliverables": [
+          "Pelo menos 3 KPIs que respondem uma pergunta de negócio real",
+          "Título e contexto — quem olhar entende sem explicação verbal",
+          "Um filtro ou drill-down interativo",
+          "Testado com alguém de fora do time técnico"
+        ]
+      },
+      {
+        "id": "soft_comunicacao",
+        "name": "Comunicação",
+        "category": "soft-skills",
+        "tier": 0,
+        "row": 0,
+        "prereq": null,
+        "weight": 1,
+        "description": "Comunicação clara com áreas técnicas e de negócio."
+      },
+      {
+        "id": "soft_documentacao",
+        "name": "Documentação",
+        "category": "soft-skills",
+        "tier": 1,
+        "row": 0,
+        "prereq": "soft_comunicacao",
+        "weight": 1,
+        "description": "Escrita técnica: READMEs, ADRs, runbooks."
+      },
+      {
+        "id": "soft_resolucao",
+        "name": "Resolução de Problemas",
+        "category": "soft-skills",
+        "tier": 2,
+        "row": 0,
+        "prereq": "soft_documentacao",
+        "weight": 1,
+        "description": "Diagnóstico estruturado e tomada de decisão sob incerteza."
+      },
+      {
+        "id": "soft_arquitetura",
+        "name": "Arquitetura",
+        "category": "soft-skills",
+        "tier": 1,
+        "row": 1,
+        "prereq": "soft_comunicacao",
+        "weight": 0.5,
+        "description": "Pensamento sistêmico e trade-offs de arquitetura."
+      },
+      {
+        "id": "soft_entrevistas",
+        "name": "Entrevistas",
+        "category": "soft-skills",
+        "tier": 1,
+        "row": 2,
+        "prereq": "soft_comunicacao",
+        "weight": 0.5,
+        "description": "Preparação técnica e comportamental para entrevistas."
+      },
+      {
+        "id": "soft_boss",
+        "name": "Liderança Técnica",
+        "category": "soft-skills",
+        "tier": 3,
+        "row": 0,
+        "prereq": "soft_resolucao",
+        "weight": 1.5,
+        "description": "Marco: liderar tecnicamente uma entrega ou mentoria.",
+        "isBoss": true,
+        "deliverables": [
+          "Liderou (ou mentorou) uma entrega real, não hipotética",
+          "Documentou decisões técnicas tomadas, não só o resultado",
+          "Deu ou recebeu feedback estruturado durante o processo",
+          "Consegue descrever um trade-off negociado com a equipe"
+        ]
+      },
+      {
+        "id": "spec_fund_1",
+        "name": "Estruturas de Dados Avançadas",
+        "category": "fundamentos",
+        "tier": 6,
+        "row": 0,
+        "prereq": "fund_boss",
+        "weight": 2,
+        "description": "Árvores balanceadas, heaps, grafos avançados.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_fund_2",
+        "name": "Complexidade Avançada",
+        "category": "fundamentos",
+        "tier": 7,
+        "row": 0,
+        "prereq": "spec_fund_1",
+        "weight": 2,
+        "description": "Programação dinâmica e otimização de algoritmos.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_prog_1",
+        "name": "Programação Assíncrona",
+        "category": "programacao",
+        "tier": 5,
+        "row": 0,
+        "prereq": "prog_boss",
+        "weight": 2,
+        "description": "asyncio, concorrência e paralelismo em Python.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_prog_2",
+        "name": "Empacotamento & Deploy",
+        "category": "programacao",
+        "tier": 6,
+        "row": 0,
+        "prereq": "spec_prog_1",
+        "weight": 2,
+        "description": "Build de pacotes, publicação, distribuição.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_db_1",
+        "name": "Tuning Avançado",
+        "category": "banco-dados",
+        "tier": 5,
+        "row": 0,
+        "prereq": "db_boss",
+        "weight": 2,
+        "description": "Query planning, particionamento, sharding.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_db_2",
+        "name": "Bancos Distribuídos",
+        "category": "banco-dados",
+        "tier": 6,
+        "row": 0,
+        "prereq": "spec_db_1",
+        "weight": 2,
+        "description": "Consistência, CAP theorem, réplicas.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_eng_1",
+        "name": "Streaming & Tempo Real",
+        "category": "engenharia-dados",
+        "tier": 5,
+        "row": 0,
+        "prereq": "eng_boss",
+        "weight": 2,
+        "description": "Kafka, Kafka Connect, processamento em streaming.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_eng_2",
+        "name": "Processamento Distribuído",
+        "category": "engenharia-dados",
+        "tier": 6,
+        "row": 0,
+        "prereq": "spec_eng_1",
+        "weight": 2,
+        "description": "Apache Spark e paralelismo em larga escala.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_eng_3",
+        "name": "Data Mesh",
+        "category": "engenharia-dados",
+        "tier": 7,
+        "row": 0,
+        "prereq": "spec_eng_2",
+        "weight": 2,
+        "description": "Domínios de dados descentralizados e governança federada.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_cloud_1",
+        "name": "Infra as Code",
+        "category": "cloud",
+        "tier": 4,
+        "row": 0,
+        "prereq": "cloud_boss",
+        "weight": 2,
+        "description": "Terraform e provisionamento declarativo.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_cloud_2",
+        "name": "Kubernetes",
+        "category": "cloud",
+        "tier": 5,
+        "row": 0,
+        "prereq": "spec_cloud_1",
+        "weight": 2,
+        "description": "Orquestração de containers em produção.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_cloud_3",
+        "name": "FinOps",
+        "category": "cloud",
+        "tier": 6,
+        "row": 0,
+        "prereq": "spec_cloud_2",
+        "weight": 2,
+        "description": "Otimização de custo em ambientes cloud.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_devops_1",
+        "name": "Observabilidade",
+        "category": "devops",
+        "tier": 4,
+        "row": 0,
+        "prereq": "devops_boss",
+        "weight": 2,
+        "description": "Logs, métricas, tracing e alertas.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_devops_2",
+        "name": "GitOps",
+        "category": "devops",
+        "tier": 5,
+        "row": 0,
+        "prereq": "spec_devops_1",
+        "weight": 2,
+        "description": "Deploy declarativo orientado por versionamento.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_viz_1",
+        "name": "Modelagem Semântica",
+        "category": "visualizacao",
+        "tier": 4,
+        "row": 0,
+        "prereq": "viz_boss",
+        "weight": 2,
+        "description": "Camadas semânticas para BI (dbt metrics, LookML-like).",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_viz_2",
+        "name": "Design de Dashboards",
+        "category": "visualizacao",
+        "tier": 5,
+        "row": 0,
+        "prereq": "spec_viz_1",
+        "weight": 2,
+        "description": "Princípios avançados de UX para dados.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_soft_1",
+        "name": "Mentoria Técnica",
+        "category": "soft-skills",
+        "tier": 4,
+        "row": 0,
+        "prereq": "soft_boss",
+        "weight": 2,
+        "description": "Estruturar e conduzir mentorias técnicas.",
+        "isSpecialization": true
+      },
+      {
+        "id": "spec_soft_2",
+        "name": "Negociação & Stakeholders",
+        "category": "soft-skills",
+        "tier": 5,
+        "row": 0,
+        "prereq": "spec_soft_1",
+        "weight": 2,
+        "description": "Negociação de prazos, escopo e expectativas.",
+        "isSpecialization": true
+      }
+    ],
+    "missions": [
+      {
+        "id": "mission_consulta_certeira",
+        "name": "Consulta Certeira",
+        "description": "Escreva uma query SQL com JOIN, GROUP BY e uma window function.",
+        "difficulty": "Médio",
+        "tag": "banco-dados",
+        "recurring": false,
+        "deadline": null,
+        "status": "em_andamento",
+        "linkedNodes": [
+          {
+            "skillId": "db_sql",
+            "xp": 40,
+            "kp": 20
+          },
+          {
+            "skillId": "db_consultas",
+            "xp": 60,
+            "kp": 30
+          }
+        ]
+      },
+      {
+        "id": "mission_pipeline_vivo",
+        "name": "Pipeline Vivo",
+        "description": "Construa um pipeline ETL simples que extrai de uma API e carrega em uma tabela.",
+        "difficulty": "Difícil",
+        "tag": "engenharia-dados",
+        "recurring": false,
+        "deadline": null,
+        "status": "pendente",
+        "linkedNodes": [
+          {
+            "skillId": "eng_etl",
+            "xp": 80,
+            "kp": 40
+          },
+          {
+            "skillId": "prog_apis",
+            "xp": 40,
+            "kp": 20
+          }
+        ]
+      },
+      {
+        "id": "mission_painel_que_fala",
+        "name": "Painel que Fala",
+        "description": "Monte um dashboard com pelo menos 3 KPIs que contem uma história para o negócio.",
+        "difficulty": "Médio",
+        "tag": "visualizacao",
+        "recurring": false,
+        "deadline": null,
+        "status": "pendente",
+        "linkedNodes": [
+          {
+            "skillId": "viz_dashboards",
+            "xp": 50,
+            "kp": 25
+          },
+          {
+            "skillId": "viz_storytelling",
+            "xp": 50,
+            "kp": 25
+          }
+        ]
+      },
+      {
+        "id": "mission_revisao_semanal_docker",
+        "name": "Revisão Semanal: Docker",
+        "description": "Revisar conceitos de Docker e praticar por 25 minutos.",
+        "difficulty": "Fácil",
+        "tag": "devops",
+        "recurring": true,
+        "deadline": null,
+        "status": "pendente",
+        "linkedNodes": [
+          {
+            "skillId": "devops_docker",
+            "xp": 15,
+            "kp": 10
+          }
+        ]
+      }
+    ],
+    "achievements": [
+      {
+        "id": "ach_streak_7",
+        "name": "Uma Semana de Ritual",
+        "scope": "global",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "streak >= 7",
+        "bonusXp": 50
+      },
+      {
+        "id": "ach_streak_30",
+        "name": "Um Mês de Disciplina",
+        "scope": "global",
+        "tier": "prata",
+        "hidden": false,
+        "condition": "streak >= 30",
+        "bonusXp": 150
+      },
+      {
+        "id": "ach_streak_100",
+        "name": "Cem Dias de Codex",
+        "scope": "global",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "streak >= 100",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_first_week",
+        "name": "Primeiros Passos",
+        "scope": "global",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "daysActive >= 1",
+        "bonusXp": 20
+      },
+      {
+        "id": "ach_rank_senior",
+        "name": "Rank Sênior Alcançado",
+        "scope": "global",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "rank == 'Sênior'",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_surprise_1",
+        "name": "???",
+        "scope": "global",
+        "tier": "prata",
+        "hidden": true,
+        "condition": "totalXp >= 3000",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_hours_50",
+        "name": "50 Horas de Codex",
+        "scope": "global",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "totalHours >= 50",
+        "bonusXp": 80
+      },
+      {
+        "id": "ach_hours_200",
+        "name": "200 Horas de Codex",
+        "scope": "global",
+        "tier": "prata",
+        "hidden": false,
+        "condition": "totalHours >= 200",
+        "bonusXp": 250
+      },
+      {
+        "id": "ach_hours_400",
+        "name": "400 Horas de Codex",
+        "scope": "global",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "totalHours >= 400",
+        "bonusXp": 500
+      },
+      {
+        "id": "ach_deep_1",
+        "name": "Domínio Profundo",
+        "scope": "global",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "deepMasteryCount >= 1",
+        "bonusXp": 80
+      },
+      {
+        "id": "ach_deep_5",
+        "name": "Domínio Profundo: Consistente",
+        "scope": "global",
+        "tier": "prata",
+        "hidden": false,
+        "condition": "deepMasteryCount >= 5",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_deep_15",
+        "name": "Domínio Profundo: Mestre",
+        "scope": "global",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "deepMasteryCount >= 15",
+        "bonusXp": 450
+      },
+      {
+        "id": "ach_fund_50",
+        "name": "Metade do Caminho: Fundamentos",
+        "scope": "categoria",
+        "categoryId": "fundamentos",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('fundamentos') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_fund_100",
+        "name": "Mestre em Fundamentos",
+        "scope": "categoria",
+        "categoryId": "fundamentos",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('fundamentos') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_prog_50",
+        "name": "Metade do Caminho: Programação",
+        "scope": "categoria",
+        "categoryId": "programacao",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('programacao') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_prog_100",
+        "name": "Mestre em Programação",
+        "scope": "categoria",
+        "categoryId": "programacao",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('programacao') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_db_50",
+        "name": "Metade do Caminho: Banco de Dados",
+        "scope": "categoria",
+        "categoryId": "banco-dados",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('banco-dados') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_db_100",
+        "name": "Mestre em Banco de Dados",
+        "scope": "categoria",
+        "categoryId": "banco-dados",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('banco-dados') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_eng_50",
+        "name": "Metade do Caminho: Eng. de Dados",
+        "scope": "categoria",
+        "categoryId": "engenharia-dados",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('engenharia-dados') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_eng_100",
+        "name": "Mestre em Engenharia de Dados",
+        "scope": "categoria",
+        "categoryId": "engenharia-dados",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('engenharia-dados') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_eng_surprise",
+        "name": "???",
+        "scope": "categoria",
+        "categoryId": "engenharia-dados",
+        "tier": "prata",
+        "hidden": true,
+        "condition": "categoryProgress('engenharia-dados') >= 75",
+        "bonusXp": 120
+      },
+      {
+        "id": "ach_cloud_50",
+        "name": "Metade do Caminho: Cloud",
+        "scope": "categoria",
+        "categoryId": "cloud",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('cloud') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_cloud_100",
+        "name": "Mestre em Cloud",
+        "scope": "categoria",
+        "categoryId": "cloud",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('cloud') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_devops_50",
+        "name": "Metade do Caminho: DevOps",
+        "scope": "categoria",
+        "categoryId": "devops",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('devops') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_devops_100",
+        "name": "Mestre em DevOps",
+        "scope": "categoria",
+        "categoryId": "devops",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('devops') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_viz_50",
+        "name": "Metade do Caminho: Visualização",
+        "scope": "categoria",
+        "categoryId": "visualizacao",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('visualizacao') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_viz_100",
+        "name": "Mestre em Visualização",
+        "scope": "categoria",
+        "categoryId": "visualizacao",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('visualizacao') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_soft_50",
+        "name": "Metade do Caminho: Soft Skills",
+        "scope": "categoria",
+        "categoryId": "soft-skills",
+        "tier": "bronze",
+        "hidden": false,
+        "condition": "categoryProgress('soft-skills') >= 50",
+        "bonusXp": 60
+      },
+      {
+        "id": "ach_soft_100",
+        "name": "Mestre em Soft Skills",
+        "scope": "categoria",
+        "categoryId": "soft-skills",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "categoryProgress('soft-skills') >= 100",
+        "bonusXp": 200
+      },
+      {
+        "id": "ach_spec_fund",
+        "name": "Especialista em Fundamentos",
+        "scope": "categoria",
+        "categoryId": "fundamentos",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('fundamentos')",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_spec_prog",
+        "name": "Especialista em Programação",
+        "scope": "categoria",
+        "categoryId": "programacao",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('programacao')",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_spec_db",
+        "name": "Especialista em Banco de Dados",
+        "scope": "categoria",
+        "categoryId": "banco-dados",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('banco-dados')",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_spec_eng",
+        "name": "Especialista em Engenharia de Dados",
+        "scope": "categoria",
+        "categoryId": "engenharia-dados",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('engenharia-dados')",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_spec_cloud",
+        "name": "Especialista em Cloud",
+        "scope": "categoria",
+        "categoryId": "cloud",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('cloud')",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_spec_devops",
+        "name": "Especialista em DevOps",
+        "scope": "categoria",
+        "categoryId": "devops",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('devops')",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_spec_viz",
+        "name": "Especialista em Visualização",
+        "scope": "categoria",
+        "categoryId": "visualizacao",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('visualizacao')",
+        "bonusXp": 400
+      },
+      {
+        "id": "ach_spec_soft",
+        "name": "Especialista em Soft Skills",
+        "scope": "categoria",
+        "categoryId": "soft-skills",
+        "tier": "ouro",
+        "hidden": false,
+        "condition": "specializationComplete('soft-skills')",
+        "bonusXp": 400
+      }
+    ]
+  },
+  "state": {
+    "nodes": {
+      "fund_logica": {
+        "xp": 0,
+        "kp": 0
+      },
+      "fund_dados": {
+        "xp": 0,
+        "kp": 0
+      },
+      "fund_informacao": {
+        "xp": 0,
+        "kp": 0
+      },
+      "fund_algoritmos": {
+        "xp": 0,
+        "kp": 0
+      },
+      "fund_estruturas": {
+        "xp": 0,
+        "kp": 0
+      },
+      "fund_boss": {
+        "xp": 0,
+        "kp": 0
+      },
+      "prog_python": {
+        "xp": 40,
+        "kp": 10
+      },
+      "prog_logging": {
+        "xp": 0,
+        "kp": 0
+      },
+      "prog_poo": {
+        "xp": 0,
+        "kp": 0
+      },
+      "prog_boas_praticas": {
+        "xp": 0,
+        "kp": 0
+      },
+      "prog_pip": {
+        "xp": 10,
+        "kp": 5
+      },
+      "prog_venv": {
+        "xp": 15,
+        "kp": 5
+      },
+      "prog_pandas": {
+        "xp": 80,
+        "kp": 20
+      },
+      "prog_numpy": {
+        "xp": 0,
+        "kp": 0
+      },
+      "prog_requests": {
+        "xp": 15,
+        "kp": 5
+      },
+      "prog_apis": {
+        "xp": 25,
+        "kp": 10
+      },
+      "prog_boss": {
+        "xp": 0,
+        "kp": 0
+      },
+      "db_sql": {
+        "xp": 40,
+        "kp": 25
+      },
+      "db_consultas": {
+        "xp": 25,
+        "kp": 10
+      },
+      "db_chaves": {
+        "xp": 0,
+        "kp": 0
+      },
+      "db_indices": {
+        "xp": 0,
+        "kp": 0
+      },
+      "db_modelagem": {
+        "xp": 25,
+        "kp": 10
+      },
+      "db_normalizacao": {
+        "xp": 0,
+        "kp": 0
+      },
+      "db_postgresql": {
+        "xp": 40,
+        "kp": 10
+      },
+      "db_boss": {
+        "xp": 0,
+        "kp": 0
+      },
+      "eng_etl": {
+        "xp": 80,
+        "kp": 50
+      },
+      "eng_elt": {
+        "xp": 40,
+        "kp": 25
+      },
+      "eng_dw": {
+        "xp": 25,
+        "kp": 10
+      },
+      "eng_datalake": {
+        "xp": 40,
+        "kp": 40,
+        "lastKpTs": 1786709596046
+      },
+      "eng_lakehouse": {
+        "xp": 0,
+        "kp": 0
+      },
+      "eng_moddim": {
+        "xp": 0,
+        "kp": 0
+      },
+      "eng_starschema": {
+        "xp": 25,
+        "kp": 10
+      },
+      "eng_snowflake": {
+        "xp": 0,
+        "kp": 0
+      },
+      "eng_orquestracao": {
+        "xp": 0,
+        "kp": 20,
+        "lastKpTs": 1786709586471
+      },
+      "eng_qualidade": {
+        "xp": 25,
+        "kp": 10
+      },
+      "eng_boss": {
+        "xp": 40,
+        "kp": 25
+      },
+      "cloud_aws": {
+        "xp": 0,
+        "kp": 0
+      },
+      "cloud_s3": {
+        "xp": 0,
+        "kp": 0
+      },
+      "cloud_iam": {
+        "xp": 0,
+        "kp": 0
+      },
+      "cloud_azure": {
+        "xp": 0,
+        "kp": 0
+      },
+      "cloud_gcp": {
+        "xp": 0,
+        "kp": 0
+      },
+      "cloud_bigquery": {
+        "xp": 0,
+        "kp": 0
+      },
+      "cloud_supabase": {
+        "xp": 0,
+        "kp": 0
+      },
+      "cloud_boss": {
+        "xp": 0,
+        "kp": 0
+      },
+      "devops_git": {
+        "xp": 40,
+        "kp": 20
+      },
+      "devops_github": {
+        "xp": 50,
+        "kp": 20
+      },
+      "devops_cicd": {
+        "xp": 0,
+        "kp": 0
+      },
+      "devops_linux": {
+        "xp": 25,
+        "kp": 10
+      },
+      "devops_docker": {
+        "xp": 0,
+        "kp": 0
+      },
+      "devops_boss": {
+        "xp": 0,
+        "kp": 0
+      },
+      "viz_dashboards": {
+        "xp": 40,
+        "kp": 15,
+        "lastKpTs": 1786648500445
+      },
+      "viz_kpis": {
+        "xp": 0,
+        "kp": 0
+      },
+      "viz_storytelling": {
+        "xp": 0,
+        "kp": 0
+      },
+      "viz_powerbi": {
+        "xp": 0,
+        "kp": 0
+      },
+      "viz_metabase": {
+        "xp": 0,
+        "kp": 0
+      },
+      "viz_boss": {
+        "xp": 0,
+        "kp": 0
+      },
+      "soft_comunicacao": {
+        "xp": 0,
+        "kp": 0
+      },
+      "soft_documentacao": {
+        "xp": 50,
+        "kp": 20
+      },
+      "soft_resolucao": {
+        "xp": 0,
+        "kp": 0
+      },
+      "soft_arquitetura": {
+        "xp": 25,
+        "kp": 10
+      },
+      "soft_entrevistas": {
+        "xp": 25,
+        "kp": 10
+      },
+      "soft_boss": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_eng_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_cloud_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_fund_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_prog_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_db_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_devops_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_viz_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "spec_soft_1": {
+        "xp": 0,
+        "kp": 0
+      },
+      "prog_pytest": {
+        "xp": 40,
+        "kp": 25,
+        "lastKpTs": 1786710602631
+      }
+    },
+    "bonusXp": 20,
+    "missions": [
+      {
+        "id": "mission_consulta_certeira",
+        "name": "Consulta Certeira",
+        "description": "Escreva uma query SQL com JOIN, GROUP BY e uma window function.",
+        "difficulty": "Médio",
+        "tag": "banco-dados",
+        "recurring": false,
+        "deadline": null,
+        "status": "em_andamento",
+        "linkedNodes": [
+          {
+            "skillId": "db_sql",
+            "xp": 40,
+            "kp": 20
+          },
+          {
+            "skillId": "db_consultas",
+            "xp": 60,
+            "kp": 30
+          }
+        ]
+      },
+      {
+        "id": "mission_pipeline_vivo",
+        "name": "Pipeline Vivo",
+        "description": "Construa um pipeline ETL simples que extrai de uma API e carrega em uma tabela.",
+        "difficulty": "Difícil",
+        "tag": "engenharia-dados",
+        "recurring": false,
+        "deadline": null,
+        "status": "pendente",
+        "linkedNodes": [
+          {
+            "skillId": "eng_etl",
+            "xp": 80,
+            "kp": 40
+          },
+          {
+            "skillId": "prog_apis",
+            "xp": 40,
+            "kp": 20
+          }
+        ]
+      },
+      {
+        "id": "mission_painel_que_fala",
+        "name": "Painel que Fala",
+        "description": "Monte um dashboard com pelo menos 3 KPIs que contem uma história para o negócio.",
+        "difficulty": "Médio",
+        "tag": "visualizacao",
+        "recurring": false,
+        "deadline": null,
+        "status": "pendente",
+        "linkedNodes": [
+          {
+            "skillId": "viz_dashboards",
+            "xp": 50,
+            "kp": 25
+          },
+          {
+            "skillId": "viz_storytelling",
+            "xp": 50,
+            "kp": 25
+          }
+        ]
+      },
+      {
+        "id": "mission_revisao_semanal_docker",
+        "name": "Revisão Semanal: Docker",
+        "description": "Revisar conceitos de Docker e praticar por 25 minutos.",
+        "difficulty": "Fácil",
+        "tag": "devops",
+        "recurring": true,
+        "deadline": null,
+        "status": "pendente",
+        "linkedNodes": [
+          {
+            "skillId": "devops_docker",
+            "xp": 15,
+            "kp": 10
+          }
+        ]
+      }
+    ],
+    "achievements": {
+      "ach_streak_7": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_streak_30": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_streak_100": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_first_week": {
+        "unlocked": true,
+        "unlockedAt": 1786456172671
+      },
+      "ach_rank_senior": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_surprise_1": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_prog_50": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_prog_100": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_eng_50": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_eng_100": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_eng_surprise": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_spec_eng": {
+        "unlocked": false,
+        "unlockedAt": null
+      },
+      "ach_spec_cloud": {
+        "unlocked": false,
+        "unlockedAt": null
+      }
+    },
+    "streak": {
+      "lastDate": "Sun Aug 16 2026",
+      "current": 1
+    },
+    "history": [
+      {
+        "ts": 1786864959667,
+        "type": "session",
+        "label": "Registro manual",
+        "detail": "1h 00min"
+      },
+      {
+        "ts": 1786864953094,
+        "type": "session",
+        "label": "Registro manual",
+        "detail": "1h 00min"
+      },
+      {
+        "ts": 1786712236479,
+        "type": "session",
+        "label": "Sessão de estudo",
+        "detail": "48min"
+      },
+      {
+        "ts": 1786710602631,
+        "type": "kp",
+        "label": "Testes Unitários",
+        "detail": "+5 KP"
+      },
+      {
+        "ts": 1786710602207,
+        "type": "kp",
+        "label": "Testes Unitários",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786709596046,
+        "type": "kp",
+        "label": "Data Lake",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786709595438,
+        "type": "kp",
+        "label": "Data Lake",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786709586471,
+        "type": "kp",
+        "label": "Orquestração",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786709586087,
+        "type": "kp",
+        "label": "Orquestração",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786648500445,
+        "type": "kp",
+        "label": "Dashboards",
+        "detail": "+5 KP"
+      },
+      {
+        "ts": 1786648499997,
+        "type": "kp",
+        "label": "Dashboards",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786648498685,
+        "type": "xp",
+        "label": "Dashboards",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786648462486,
+        "type": "kp",
+        "label": "Testes Unitários",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786648461285,
+        "type": "xp",
+        "label": "Testes Unitários",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786591129904,
+        "type": "xp",
+        "label": "Python",
+        "detail": "-10 XP"
+      },
+      {
+        "ts": 1786591129560,
+        "type": "xp",
+        "label": "Python",
+        "detail": "-10 XP"
+      },
+      {
+        "ts": 1786591114544,
+        "type": "xp",
+        "label": "Python",
+        "detail": "+10 XP"
+      },
+      {
+        "ts": 1786591109168,
+        "type": "xp",
+        "label": "Python",
+        "detail": "+10 XP"
+      },
+      {
+        "ts": 1786591077656,
+        "type": "xp",
+        "label": "Python",
+        "detail": "-10 XP"
+      },
+      {
+        "ts": 1786591076864,
+        "type": "xp",
+        "label": "Python",
+        "detail": "-10 XP"
+      },
+      {
+        "ts": 1786591076112,
+        "type": "xp",
+        "label": "Python",
+        "detail": "-10 XP"
+      },
+      {
+        "ts": 1786591075648,
+        "type": "xp",
+        "label": "Python",
+        "detail": "-10 XP"
+      },
+      {
+        "ts": 1786591068184,
+        "type": "xp",
+        "label": "Python",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786589841775,
+        "type": "session",
+        "label": "Sessão de estudo",
+        "detail": "21s"
+      },
+      {
+        "ts": 1786588732985,
+        "type": "session",
+        "label": "Registro manual",
+        "detail": "1h 28min"
+      },
+      {
+        "ts": 1786563970496,
+        "type": "session",
+        "label": "Sessão de estudo",
+        "detail": "37min"
+      },
+      {
+        "ts": 1786511999359,
+        "type": "session",
+        "label": "Sessão de estudo",
+        "detail": "11s"
+      },
+      {
+        "ts": 1786508967695,
+        "type": "kp",
+        "label": "Qualidade de Dados",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786508966943,
+        "type": "xp",
+        "label": "Qualidade de Dados",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786492803530,
+        "type": "session",
+        "label": "Sessão de estudo concluída",
+        "detail": "88 min"
+      },
+      {
+        "ts": 1786492303100,
+        "type": "session",
+        "label": "Pomodoro concluído",
+        "detail": "25 min de foco"
+      },
+      {
+        "ts": 1786491975458,
+        "type": "kp",
+        "label": "Pandas",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786491974642,
+        "type": "xp",
+        "label": "Pandas",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786491956834,
+        "type": "kp",
+        "label": "ETL",
+        "detail": "+25 KP"
+      },
+      {
+        "ts": 1786491955834,
+        "type": "xp",
+        "label": "ETL",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786490742098,
+        "type": "session",
+        "label": "Pomodoro concluído",
+        "detail": "25 min de foco"
+      },
+      {
+        "ts": 1786490667330,
+        "type": "kp",
+        "label": "Documentação",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786490665802,
+        "type": "xp",
+        "label": "Documentação",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786490650010,
+        "type": "kp",
+        "label": "GitHub",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786490648818,
+        "type": "xp",
+        "label": "GitHub",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786490067730,
+        "type": "kp",
+        "label": "Git",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786490066034,
+        "type": "xp",
+        "label": "Git",
+        "detail": "+15 XP"
+      },
+      {
+        "ts": 1786489844018,
+        "type": "kp",
+        "label": "ETL",
+        "detail": "+25 KP"
+      },
+      {
+        "ts": 1786489843034,
+        "type": "xp",
+        "label": "ETL",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786489240098,
+        "type": "session",
+        "label": "Pomodoro concluído",
+        "detail": "25 min de foco"
+      },
+      {
+        "ts": 1786488457103,
+        "type": "session",
+        "label": "Pomodoro concluído",
+        "detail": "25 min de foco"
+      },
+      {
+        "ts": 1786488318786,
+        "type": "kp",
+        "label": "Data Lake",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786488317834,
+        "type": "xp",
+        "label": "Data Lake",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786487596099,
+        "type": "kp",
+        "label": "Arquitetura",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786487595282,
+        "type": "xp",
+        "label": "Arquitetura",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786487094050,
+        "type": "kp",
+        "label": "Data Lake",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786487093034,
+        "type": "xp",
+        "label": "Data Lake",
+        "detail": "+15 XP"
+      },
+      {
+        "ts": 1786456764799,
+        "type": "kp",
+        "label": "Documentação",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456764119,
+        "type": "xp",
+        "label": "Documentação",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456755655,
+        "type": "kp",
+        "label": "Entrevistas",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456754696,
+        "type": "xp",
+        "label": "Entrevistas",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456743455,
+        "type": "kp",
+        "label": "Linux",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456742512,
+        "type": "xp",
+        "label": "Linux",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456736151,
+        "type": "kp",
+        "label": "GitHub",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456735231,
+        "type": "xp",
+        "label": "GitHub",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456729711,
+        "type": "kp",
+        "label": "Git",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456728822,
+        "type": "xp",
+        "label": "Git",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456712903,
+        "type": "kp",
+        "label": "Star Schema",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456712087,
+        "type": "xp",
+        "label": "Star Schema",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456709383,
+        "type": "kp",
+        "label": "Data Warehouse",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456708639,
+        "type": "xp",
+        "label": "Data Warehouse",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456685391,
+        "type": "kp",
+        "label": "ELT",
+        "detail": "+25 KP"
+      },
+      {
+        "ts": 1786456684751,
+        "type": "xp",
+        "label": "ELT",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786456678639,
+        "type": "kp",
+        "label": "Pipeline Completo",
+        "detail": "+25 KP"
+      },
+      {
+        "ts": 1786456677679,
+        "type": "xp",
+        "label": "Pipeline Completo",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786456484111,
+        "type": "kp",
+        "label": "Modelagem",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456483359,
+        "type": "xp",
+        "label": "Modelagem",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456475591,
+        "type": "kp",
+        "label": "Consultas",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456474095,
+        "type": "xp",
+        "label": "Consultas",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456466015,
+        "type": "kp",
+        "label": "SQL",
+        "detail": "+25 KP"
+      },
+      {
+        "ts": 1786456462103,
+        "type": "xp",
+        "label": "SQL",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786456323767,
+        "type": "kp",
+        "label": "PostgreSQL",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456322583,
+        "type": "xp",
+        "label": "PostgreSQL",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786456303975,
+        "type": "kp",
+        "label": "Pip",
+        "detail": "+5 KP"
+      },
+      {
+        "ts": 1786456302935,
+        "type": "xp",
+        "label": "Pip",
+        "detail": "+10 XP"
+      },
+      {
+        "ts": 1786456291199,
+        "type": "kp",
+        "label": "Virtual Env",
+        "detail": "+5 KP"
+      },
+      {
+        "ts": 1786456290063,
+        "type": "xp",
+        "label": "Virtual Env",
+        "detail": "+15 XP"
+      },
+      {
+        "ts": 1786456280975,
+        "type": "kp",
+        "label": "Requests",
+        "detail": "+5 KP"
+      },
+      {
+        "ts": 1786456279655,
+        "type": "xp",
+        "label": "Requests",
+        "detail": "+15 XP"
+      },
+      {
+        "ts": 1786456272727,
+        "type": "kp",
+        "label": "APIs",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456269735,
+        "type": "xp",
+        "label": "APIs",
+        "detail": "+25 XP"
+      },
+      {
+        "ts": 1786456262406,
+        "type": "kp",
+        "label": "Pandas",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456261263,
+        "type": "xp",
+        "label": "Pandas",
+        "detail": "+40 XP"
+      },
+      {
+        "ts": 1786456176943,
+        "type": "kp",
+        "label": "Python",
+        "detail": "+10 KP"
+      },
+      {
+        "ts": 1786456172671,
+        "type": "achievement",
+        "label": "Primeiros Passos",
+        "detail": "Conquista desbloqueada (+20 XP)"
+      },
+      {
+        "ts": 1786456172671,
+        "type": "xp",
+        "label": "Python",
+        "detail": "+40 XP"
+      }
+    ],
+    "notifiedPrereq": {
+      "prog_pandas": true,
+      "prog_apis": true,
+      "prog_requests": true,
+      "prog_venv": true,
+      "prog_pip": true,
+      "db_postgresql": true,
+      "db_consultas": true,
+      "db_modelagem": true,
+      "eng_boss": true,
+      "eng_elt": true,
+      "eng_datalake": true,
+      "eng_dw": true,
+      "eng_starschema": true,
+      "devops_github": true,
+      "devops_linux": true,
+      "soft_entrevistas": true,
+      "soft_documentacao": true,
+      "soft_arquitetura": true,
+      "cloud_supabase": true,
+      "eng_qualidade": true,
+      "fund_dados": true,
+      "fund_informacao": true,
+      "fund_algoritmos": true,
+      "fund_estruturas": true,
+      "fund_boss": true,
+      "prog_boas_praticas": true,
+      "prog_boss": true,
+      "prog_pytest": true,
+      "eng_orquestracao": true
+    },
+    "weeklyGoal": 200,
+    "categoriesCelebrated": {},
+    "weeklyGoalCelebratedAt": 1786981464425,
+    "totalStudySeconds": 17620
+  }
+}
