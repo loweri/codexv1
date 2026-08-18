@@ -1,100 +1,93 @@
-# ✦ Compendium: Codex do Engenheiro de Dados
+# 📜 Compendium — Codex do Engenheiro de Dados
 
-Uma árvore de habilidades estilo RPG pra gamificar o estudo contínuo da trilha de **Engenharia de Dados** — 100% local, sem conta, sem backend, sem instalar nada além de um navegador.
+![PWA](https://img.shields.io/badge/PWA-100%25_Offline--First-5A0FC8?logo=pwa&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?logo=javascript&logoColor=black)
+![HTML5](https://img.shields.io/badge/HTML5-Semantic-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-Dark_Theme-1572B6?logo=css3&logoColor=white)
+![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Live_App-222222?logo=githubpages&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-<p align="center">
-  <img src="screenshots/dark-theme.png" alt="Compendium — tema Manuscrito Arcano (escuro)" width="100%">
-</p>
-
-<details>
-<summary>Ver no tema claro (Blueprint)</summary>
-<p align="center">
-  <img src="screenshots/light-theme.png" alt="Compendium — tema Blueprint (claro)" width="100%">
-</p>
-</details>
+*(Bilingual Documentation: [Português](#-português) | [English](#-english))*
 
 ---
 
-## O que é
+## 🎮 Interface & Skill Tree / Visão Geral
 
-Cada habilidade da trilha — de lógica de programação a arquitetura de pipelines — é um nó numa árvore, com XP e progresso próprios. Em vez de uma lista de tópicos pra marcar como "concluído", o Compendium trata isso como um jogo de verdade: nível, rank, conquistas, streak, especializações. A ideia é simples — **estudar deveria dar vontade de voltar no dia seguinte.**
+<p align="center">
+  <img src="screenshots/codex_banner.png" alt="Compendium — Data Engineer Codex Banner" width="100%">
+</p>
 
-## Funcionalidades
-
-**Sistema de progressão**
-- 8 categorias (Fundamentos, Programação, Banco de Dados, Engenharia de Dados, Cloud, DevOps, Visualização, Soft Skills), mais de 60 habilidades
-- XP e KP (Conhecimento) independentes por nó — pré-requisito é sugestão, nunca bloqueio
-- Rank global (Aprendiz → Estudante → Praticante → Avançado → Sênior → Mestre do Codex)
-- Especializações avançadas por categoria, desbloqueadas ao masterizar o projeto principal daquela trilha
-- Atributos estilo RPG (INT/DEX/CON/WIS/CHA), calculados a partir do seu progresso real
-
-**Conteúdo de estudo**
-- Recursos recomendados (documentação oficial) direto no nó
-- Checklist de entrega nos projetos "Marco Principal"
-- Campo de portfólio pra linkar seu repositório quando conclui um projeto
-- Bloco de notas por habilidade
-
-**Hábito e produtividade**
-- Timer Pomodoro + timer de Sessão (soma num total de horas de estudo permanente)
-- Streak de dias consecutivos, com indicador visual de risco
-- Recomendação inteligente — botão "O que estudar hoje?" olha prazos de missão e nós esquecidos
-- Resumo ao reabrir o app, notificações do navegador (opcionais), desfazer último lançamento
-
-**Missões e conquistas**
-- Missões vinculadas a habilidades específicas (inclusive recorrentes)
-- Conquistas por categoria e globais, com tiers bronze/prata/ouro
-- Fila de revisão — sinaliza conhecimento (KP) que está parado há mais de 7 dias
-
-**Interface**
-- Dois temas completos — Manuscrito Arcano (escuro) e Blueprint (claro) — trocáveis a qualquer momento
-- Painéis retráteis, busca de habilidades, atalhos de teclado
-- Instalável como app (PWA), funciona offline
-
-## Seus dados
-
-Tudo fica só no seu navegador (`localStorage`) — não existe servidor, conta ou telemetria. Isso também significa que o progresso é por navegador/endereço: `Exportar` e `Importar` (no menu ☰) são o jeito de levar seu progresso entre dispositivos ou versões.
-
-## Como rodar localmente
-
-Não precisa de instalação — é HTML/CSS/JS puro, sem build:
-
-```bash
-git clone https://github.com/SEU-USUARIO/SEU-REPOSITORIO.git
-cd SEU-REPOSITORIO
-python3 -m http.server 8000
-```
-
-Abra `http://localhost:8000`. Servir por HTTP (não abrir o `index.html` direto como arquivo) é necessário pra o service worker e a instalação como PWA funcionarem.
-
-## Publicar com HTTPS (pra instalar no celular)
-
-PWA exige um contexto seguro — `localhost` já conta, mas um IP de rede local não. O jeito mais simples e gratuito:
-
-1. Suba os arquivos pra um repositório no GitHub
-2. **Settings → Pages** → Source: branch `main`, pasta `/ (root)`
-3. Espera publicar (1-2 min) e acessa a URL gerada (`seu-usuario.github.io/repositorio`) em qualquer aparelho
-4. No celular: Chrome → menu → "Instalar aplicativo" · Safari (iOS) → Compartilhar → "Adicionar à Tela de Início"
-
-## Estrutura do projeto
-
-```
-├── index.html          → Estrutura da página, carrega os outros arquivos
-├── style.css            → Layout e estrutura (grid, espaçamento) — nunca cor
-├── theme.css             → Tema Manuscrito Arcano (escuro) — só estética
-├── theme-light.css        → Tema Blueprint (claro) — mesma estrutura, cores diferentes
-├── script.js              → Toda a lógica: XP/KP, estado, missões, conquistas
-├── data-embedded.js        → Dados: categorias, habilidades, missões e conquistas
-├── manifest.json            → Metadados do PWA
-├── service-worker.js         → Cache offline (estratégia network-first)
-└── icons/                     → Ícones do app em múltiplos tamanhos
-```
-
-`style.css` e os arquivos de tema são propositalmente separados — trocar de tema visual nunca exige tocar em `script.js` ou `data-embedded.js`.
-
-## Stack
-
-100% vanilla — sem frameworks, sem bundler, sem dependência de build. Roda em qualquer navegador moderno abrindo um arquivo estático.
+<p align="center">
+  🌐 <b><a href="https://loweri.github.io/codexv1/">Acesse o Aplicativo PWA ao Vivo no GitHub Pages</a></b>
+</p>
 
 ---
 
-<p align="center"><sub>Feito pra acompanhar os próprios estudos de Engenharia de Dados — fique à vontade pra clonar e adaptar pra sua trilha.</sub></p>
+## 🇧🇷 Português
+
+O **Compendium** é um aplicativo web progressivo (**Progressive Web App - PWA**) gamificado, desenvolvido para acompanhar, estruturar e validar a jornada de evolução contínua em **Engenharia de Dados**. Inspirado em árvores de habilidades de RPG (*Skill Trees*), o sistema transforma o aprendizado técnico em missões práticas, distribuindo pontos de experiência (**XP**) e pontos de conhecimento teórico (**KP**).
+
+---
+
+### ✨ Principais Recursos
+
+- 🌐 **100% Offline-First (PWA):** Equipado com `Service Worker` e `Cache Storage API` para carregar instantaneamente e funcionar sem conexão com a internet.
+- 🌳 **8 Árvores de Habilidades Especializadas:**
+  1. *Fundamentos da Computação & Dados*
+  2. *Programação & Python Avançado*
+  3. *Banco de Dados Relacionais & SQL*
+  4. *Engenharia de Dados (PySpark, Delta Lake, Airflow)*
+  5. *Cloud Computing (AWS, GCP, Azure)*
+  6. *DevOps & Infraestrutura (Docker, CI/CD, Linux)*
+  7. *Visualização de Dados & Analytics (Streamlit, Plotly, Power BI)*
+  8. *Soft Skills & Liderança Técnica*
+- 🎯 **Sistema de Missões Dinâmicas:** Criação e gestão de missões com níveis de dificuldade, prazos, recorrência e vinculação direta aos nós da árvore.
+- 💾 **Persistência Local & Backup:** Armazenamento seguro via `localStorage` com suporte a **Exportar/Importar JSON** para sincronização entre dispositivos.
+- 🎨 **Design System Dark Mode:** Interface moderna com tema escuro imersivo, efeitos glassmorphism e microinterações responsivas.
+
+---
+
+### 📂 Estrutura do Projeto
+
+```text
+codexv1/
+├── index.html              # Estrutura semântica principal e modais
+├── style.css               # Estilização base, layout e tipografia
+├── theme.css               # Design tokens para o tema escuro (Dark Theme)
+├── theme-light.css         # Design tokens para o tema claro (Light Theme)
+├── script.js               # Lógica da aplicação, gestão de estado e XP/KP
+├── service-worker.js       # Cache de assets e suporte offline PWA
+├── manifest.json           # Manifesto PWA para instalação como app nativo
+├── data-embedded.js        # Dados e nós iniciais das árvores de habilidades
+│
+├── icons/                  # Ícones em múltiplas resoluções para o PWA
+└── screenshots/            # Banners e capturas de tela do aplicativo
+```
+
+---
+
+### 🚀 Como Usar e Instalar
+
+1. **Acessar Online:** Abra **[https://loweri.github.io/codexv1/](https://loweri.github.io/codexv1/)** no navegador.
+2. **Instalar como App:** No Google Chrome, Edge ou celular, clique no ícone **"Instalar aplicativo"** ou **"Adicionar à tela inicial"**.
+3. **Backup dos Seus Dados:** Use o botão **Exportar** no rodapé para baixar o arquivo `.json` com seu progresso salvo.
+
+---
+
+## 🇺🇸 English
+
+**Compendium** is an offline-first **Progressive Web App (PWA)** gamifying technical progression in **Data Engineering**. Inspired by RPG skill trees, it structures learning into actionable missions, rewarding hands-on experience (**XP**) and theoretical knowledge (**KP**).
+
+### 🌟 Key Highlights
+
+- **Offline-First PWA:** Service Worker caching ensures instant load times with zero network dependency.
+- **8 Domain Skill Trees:** Covering Core Fundamentals, Python, SQL, Lakehouse, Cloud, DevOps, and Analytics.
+- **Mission & Quest Engine:** Dynamic goal tracking linked directly to specific engineering competencies.
+- **Client-Side Persistence:** LocalStorage state management with JSON backup export/import capabilities.
+
+---
+
+## 👨‍💻 Autor / Author
+
+**Ericles Fernandes Oliveira** — *Data Engineer*  
+GitHub: [loweri](https://github.com/loweri) | LinkedIn: [ericlesoliveira](https://www.linkedin.com/in/ericlesoliveira/)
